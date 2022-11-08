@@ -1,4 +1,4 @@
-use std::{fmt::Display, ops};
+use std::{fmt::Display, io, ops};
 
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub struct Vec3([f64; 3]);
@@ -156,12 +156,24 @@ impl Display for Vec3 {
     }
 }
 
-type Point3 = Vec3;
-type Color = Vec3;
+pub type Point3 = Vec3;
+pub type Color = Vec3;
+
+impl Color {
+    pub fn write(self, w: &mut impl io::Write) -> io::Result<()> {
+        // Write the translated [0,255] value of each color component.
+        let r = (255.999 * self.x()) as i32;
+        let g = (255.999 * self.y()) as i32;
+        let b = (255.999 * self.z()) as i32;
+        writeln!(w, "{r} {g} {b}")
+    }
+}
 
 #[cfg(test)]
 mod test {
-    use super::Vec3;
+    use std::str;
+
+    use super::{Color, Vec3};
 
     #[test]
     fn test_default() {
@@ -337,5 +349,15 @@ mod test {
         let v = Vec3::new(1f64, 2f64, 3f64);
 
         assert_eq!("1 2 3", v.to_string())
+    }
+
+    #[test]
+    fn test_write_color() -> std::io::Result<()> {
+        let mut buf: Vec<u8> = vec![];
+        let color = Color::new(0.25, 0.25, 0.5);
+        color.write(&mut buf)?;
+
+        assert_eq!("63 63 127\n", String::from_utf8_lossy(&buf));
+        Ok(())
     }
 }
