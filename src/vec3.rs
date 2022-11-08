@@ -170,9 +170,7 @@ impl Color {
 }
 
 #[cfg(test)]
-mod test {
-    use std::str;
-
+mod tests {
     use super::{Color, Vec3};
 
     #[test]
