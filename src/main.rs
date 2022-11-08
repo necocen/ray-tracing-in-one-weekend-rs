@@ -53,15 +53,15 @@ fn ray_color(ray: Ray) -> Color {
 /// Returns minimum `t` value if the ray hits to there sphere.
 fn hit_sphere(center: Point3, radius: f64, ray: Ray) -> Option<f64> {
     let oc = ray.origin - center;
-    let a = ray.direction.dot(ray.direction);
-    let b = 2.0 * oc.dot(ray.direction);
+    let a = ray.direction.length_squared();
+    let half_b = oc.dot(ray.direction);
     let c = oc.dot(oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
+    let discriminant = half_b * half_b - a * c;
     if discriminant < 0.0 {
         // not hit
         None
     } else {
         // hit
-        Some((-b - discriminant.sqrt()) / (2.0 * a))
+        Some((-half_b - discriminant.sqrt()) / a)
     }
 }
