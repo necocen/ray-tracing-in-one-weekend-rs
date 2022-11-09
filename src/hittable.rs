@@ -44,7 +44,9 @@ pub trait Hittable {
     fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
-impl Hittable for Vec<Box<dyn Hittable>> {
+pub type HittableList = Vec<Box<dyn Hittable>>;
+
+impl Hittable for HittableList {
     fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut t_max = t_max;
         let mut record: Option<HitRecord> = None;

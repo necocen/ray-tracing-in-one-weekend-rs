@@ -1,4 +1,4 @@
-use hittable::{HitRecord, Hittable};
+use hittable::{HitRecord, Hittable, HittableList};
 use ray::Ray;
 use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
@@ -13,6 +13,12 @@ fn main() {
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
+
+    // World
+    let world: HittableList = vec![
+        Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)),
+        Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)),
+    ];
 
     // Camera
     let viewport_height = 2.0;
@@ -38,17 +44,15 @@ fn main() {
                 origin,
                 lower_left_corner + u * horizontal + v * vertical - origin,
             );
-            let c = ray_color(ray);
+            let c = ray_color(ray, &world);
             _ = c.write(&mut std::io::stdout());
         }
     }
     eprint!("\nDone.\n");
 }
 
-fn ray_color(ray: Ray) -> Color {
-    let sphere = Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5);
-    let spheres: Vec<Box<dyn Hittable>> = vec![Box::new(sphere)];
-    if let Some(HitRecord { normal, .. }) = spheres.hit(ray, f64::MIN, f64::MAX) {
+fn ray_color(ray: Ray, world: &impl Hittable) -> Color {
+    if let Some(HitRecord { normal, .. }) = world.hit(ray, 0.0, f64::INFINITY) {
         return 0.5 * Color::new(normal.x() + 1.0, normal.y() + 1.0, normal.z() + 1.0);
     }
     let t = 0.5 * (ray.direction.unit().y() + 1.0);
