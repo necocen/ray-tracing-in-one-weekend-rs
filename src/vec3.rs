@@ -1,5 +1,7 @@
 use std::{fmt::Display, io, ops};
 
+use rand::Rng;
+
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub struct Vec3([f64; 3]);
 
@@ -42,6 +44,20 @@ impl Vec3 {
 
     pub fn unit(self) -> Vec3 {
         self / self.length()
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        let mut rng = rand::thread_rng();
+        loop {
+            let v = Vec3::new(
+                rng.gen_range(-1.0..=1.0),
+                rng.gen_range(-1.0..=1.0),
+                rng.gen_range(-1.0..=1.0),
+            );
+            if v.length_squared() < 1.0 {
+                return v;
+            }
+        }
     }
 }
 
