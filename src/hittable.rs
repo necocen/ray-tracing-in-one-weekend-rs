@@ -7,8 +7,37 @@ use crate::{
 #[non_exhaustive]
 pub struct HitRecord {
     pub p: Point3,
+    /// The normal always point against the hitting ray
     pub normal: Vec3,
     pub t: f64,
+    /// True if hitting ray is outgoing to surface
+    pub front_face: bool,
+}
+
+impl HitRecord {
+    pub fn new(p: Point3, normal: Vec3, t: f64, front_face: bool) -> HitRecord {
+        HitRecord {
+            p,
+            normal,
+            t,
+            front_face,
+        }
+    }
+
+    pub fn new_with_outward_normal(ray: Ray, t: f64, outward_normal: Vec3) -> HitRecord {
+        let front_face = ray.direction.dot(outward_normal) < 0.0;
+        let normal = if front_face {
+            outward_normal
+        } else {
+            -outward_normal
+        };
+        HitRecord {
+            p: ray.at(t),
+            normal,
+            t,
+            front_face,
+        }
+    }
 }
 
 pub trait Hittable {
