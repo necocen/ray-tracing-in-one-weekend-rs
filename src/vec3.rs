@@ -186,10 +186,14 @@ impl Color {
                 x
             }
         }
+        // gamma-correct for gamma = 2.0
+        let r = self.x().sqrt();
+        let g = self.y().sqrt();
+        let b = self.z().sqrt();
         // Write the translated [0,255] value of each color component.
-        let r = (255.999 * clamp(self.x(), 0.0, 0.999)) as i32;
-        let g = (255.999 * clamp(self.y(), 0.0, 0.999)) as i32;
-        let b = (255.999 * clamp(self.z(), 0.0, 0.999)) as i32;
+        let r = (255.999 * clamp(r, 0.0, 0.999)) as i32;
+        let g = (255.999 * clamp(g, 0.0, 0.999)) as i32;
+        let b = (255.999 * clamp(b, 0.0, 0.999)) as i32;
         writeln!(w, "{r} {g} {b}")
     }
 }
