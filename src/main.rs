@@ -47,7 +47,8 @@ fn main() {
 
 fn ray_color(ray: Ray) -> Color {
     let sphere = Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5);
-    if let Some(HitRecord { normal, .. }) = sphere.hit(ray, f64::MIN, f64::MAX) {
+    let spheres: Vec<Box<dyn Hittable>> = vec![Box::new(sphere)];
+    if let Some(HitRecord { normal, .. }) = spheres.hit(ray, f64::MIN, f64::MAX) {
         return 0.5 * Color::new(normal.x() + 1.0, normal.y() + 1.0, normal.z() + 1.0);
     }
     let t = 0.5 * (ray.direction.unit().y() + 1.0);
