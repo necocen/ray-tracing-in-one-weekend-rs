@@ -161,10 +161,19 @@ pub type Color = Vec3;
 
 impl Color {
     pub fn write(self, w: &mut impl io::Write) -> io::Result<()> {
+        fn clamp(x: f64, min: f64, max: f64) -> f64 {
+            if x < min {
+                min
+            } else if x > max {
+                max
+            } else {
+                x
+            }
+        }
         // Write the translated [0,255] value of each color component.
-        let r = (255.999 * self.x()) as i32;
-        let g = (255.999 * self.y()) as i32;
-        let b = (255.999 * self.z()) as i32;
+        let r = (255.999 * clamp(self.x(), 0.0, 0.999)) as i32;
+        let g = (255.999 * clamp(self.y(), 0.0, 0.999)) as i32;
+        let b = (255.999 * clamp(self.z(), 0.0, 0.999)) as i32;
         writeln!(w, "{r} {g} {b}")
     }
 }
