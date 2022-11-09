@@ -58,7 +58,7 @@ fn ray_color(ray: Ray, world: &impl Hittable, depth: i32) -> Color {
         return Color::default();
     }
     if let Some(HitRecord { normal, p, .. }) = world.hit(ray, 0.001, f64::INFINITY) {
-        let target = p + normal + Vec3::random_in_unit_sphere();
+        let target = p + normal + Vec3::random_in_unit_sphere().unit();
         return 0.5 * ray_color(Ray::new(p, target - p), world, depth - 1);
     }
     let t = 0.5 * (ray.direction.unit().y() + 1.0);
