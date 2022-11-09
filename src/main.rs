@@ -1,7 +1,11 @@
+use hittable::{HitRecord, Hittable};
 use ray::Ray;
+use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
 
+mod hittable;
 mod ray;
+mod sphere;
 mod vec3;
 
 fn main() {
@@ -42,26 +46,10 @@ fn main() {
 }
 
 fn ray_color(ray: Ray) -> Color {
-    if let Some(t) = hit_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, ray) {
-        let n = (ray.at(t) - Point3::new(0.0, 0.0, -1.0)).unit();
-        return 0.5 * Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
+    let sphere = Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5);
+    if let Some(HitRecord { normal, .. }) = sphere.hit(ray, f64::MIN, f64::MAX) {
+        return 0.5 * Color::new(normal.x() + 1.0, normal.y() + 1.0, normal.z() + 1.0);
     }
     let t = 0.5 * (ray.direction.unit().y() + 1.0);
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
-}
-
-/// Returns minimum `t` value if the ray hits to there sphere.
-fn hit_sphere(center: Point3, radius: f64, ray: Ray) -> Option<f64> {
-    let oc = ray.origin - center;
-    let a = ray.direction.length_squared();
-    let half_b = oc.dot(ray.direction);
-    let c = oc.dot(oc) - radius * radius;
-    let discriminant = half_b * half_b - a * c;
-    if discriminant < 0.0 {
-        // not hit
-        None
-    } else {
-        // hit
-        Some((-half_b - discriminant.sqrt()) / a)
-    }
 }
