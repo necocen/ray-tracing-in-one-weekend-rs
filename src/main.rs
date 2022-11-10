@@ -1,12 +1,17 @@
 use camera::Camera;
-use hittable::{HitRecord, Hittable, HittableList};
+use hittable::{Hittable, HittableList};
+use lambertian::Lambertian;
+use metal::Metal;
 use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
-use vec3::{Color, Point3, Vec3};
+use vec3::{Color, Point3};
 
 mod camera;
 mod hittable;
+mod lambertian;
+mod material;
+mod metal;
 mod ray;
 mod sphere;
 mod vec3;
@@ -20,9 +25,32 @@ fn main() {
     let max_depth = 50;
 
     // World
+    let material_ground = Lambertian::new(Color::new(0.8, 0.8, 0.0));
+    let material_center = Lambertian::new(Color::new(0.7, 0.3, 0.3));
+    let material_left = Metal::new(Color::new(0.8, 0.8, 0.8));
+    let material_right = Metal::new(Color::new(0.8, 0.6, 0.2));
+
     let world: HittableList = vec![
-        Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)),
-        Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)),
+        Box::new(Sphere::new(
+            Point3::new(0.0, -100.5, -1.0),
+            100.0,
+            material_ground,
+        )),
+        Box::new(Sphere::new(
+            Point3::new(0.0, 0.0, -1.0),
+            0.5,
+            material_center,
+        )),
+        Box::new(Sphere::new(
+            Point3::new(-1.0, 0.0, -1.0),
+            0.5,
+            material_left,
+        )),
+        Box::new(Sphere::new(
+            Point3::new(1.0, 0.0, -1.0),
+            0.5,
+            material_right,
+        )),
     ];
 
     // Camera
@@ -57,9 +85,12 @@ fn ray_color(ray: Ray, world: &impl Hittable, depth: i32) -> Color {
     if depth <= 0 {
         return Color::default();
     }
-    if let Some(HitRecord { normal, p, .. }) = world.hit(ray, 0.001, f64::INFINITY) {
-        let target = p + normal + Vec3::random_in_unit_sphere().unit();
-        return 0.5 * ray_color(Ray::new(p, target - p), world, depth - 1);
+    if let Some(hit) = world.hit(ray, 0.001, f64::INFINITY) {
+        if let Some(scatter) = hit.material.scatter(&ray, &hit) {
+            return scatter.attenuation * ray_color(scatter.ray, world, depth - 1);
+        } else {
+            return Color::default();
+        }
     }
     let t = 0.5 * (ray.direction.unit().y() + 1.0);
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)

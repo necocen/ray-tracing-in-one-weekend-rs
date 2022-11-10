@@ -59,6 +59,11 @@ impl Vec3 {
             }
         }
     }
+
+    pub fn is_near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.0[0].abs() < s && self.0[1].abs() < s && self.0[2].abs() < s
+    }
 }
 
 impl ops::Neg for Vec3 {

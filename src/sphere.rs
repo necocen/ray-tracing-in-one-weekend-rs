@@ -1,18 +1,24 @@
 use crate::{
     hittable::{HitRecord, Hittable},
+    material::Material,
     vec3::Point3,
 };
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug)]
 #[non_exhaustive]
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
+    pub material: Box<dyn Material + 'static>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Sphere {
-        Sphere { center, radius }
+    pub fn new(center: Point3, radius: f64, material: impl Material + 'static) -> Sphere {
+        Sphere {
+            center,
+            radius,
+            material: Box::new(material),
+        }
     }
 }
 
@@ -44,7 +50,13 @@ impl Hittable for Sphere {
         }
 
         let p = ray.at(root);
-        let h = HitRecord::new_with_outward_normal(ray, root, (p - self.center) / self.radius);
+
+        let h = HitRecord::new_with_outward_normal(
+            ray,
+            root,
+            (p - self.center) / self.radius,
+            &*self.material,
+        );
         Some(h)
     }
 }
