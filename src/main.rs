@@ -1,24 +1,17 @@
 use std::f64::consts::PI;
 
 use camera::Camera;
-use dielectric::Dielectric;
-use hittable::{Hittable, HittableList};
-use lambertian::Lambertian;
-use metal::Metal;
+use hittables::{Hittable, HittableList, Sphere};
+use materials::{Dielectric, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
 use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
-use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
 
 mod camera;
-mod dielectric;
-mod hittable;
-mod lambertian;
-mod material;
-mod metal;
+mod hittables;
+mod materials;
 mod ray;
-mod sphere;
 mod vec3;
 
 fn main() {

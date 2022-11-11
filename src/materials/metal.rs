@@ -1,9 +1,10 @@
 use crate::{
-    hittable::HitRecord,
-    material::{Material, Scatter},
+    hittables::HitRecord,
     ray::Ray,
     vec3::{Color, Vec3},
 };
+
+use super::{Material, Scatter};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Metal {

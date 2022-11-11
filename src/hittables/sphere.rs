@@ -1,8 +1,6 @@
-use crate::{
-    hittable::{HitRecord, Hittable},
-    material::Material,
-    vec3::Point3,
-};
+use crate::{materials::Material, ray::Ray, vec3::Point3};
+
+use super::{HitRecord, Hittable};
 
 #[derive(Debug)]
 #[non_exhaustive]
@@ -23,7 +21,7 @@ impl<M: Material> Sphere<M> {
 }
 
 impl<M: Material> Hittable for Sphere<M> {
-    fn hit(&self, ray: crate::ray::Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
         let a = ray.direction.length_squared();
         let half_b = oc.dot(ray.direction);

@@ -1,8 +1,4 @@
-use crate::{hittable::HitRecord, ray::Ray, vec3::Color};
-
-pub trait Material: std::fmt::Debug + Send + Sync {
-    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<Scatter>;
-}
+use crate::{ray::Ray, vec3::Color};
 
 #[derive(Debug, Clone, Copy)]
 #[non_exhaustive]
