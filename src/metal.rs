@@ -8,11 +8,15 @@ use crate::{
 #[derive(Debug, Clone, Copy)]
 pub struct Metal {
     albedo: Color,
+    fuzziness: f64,
 }
 
 impl Metal {
-    pub fn new(albedo: Color) -> Metal {
-        Metal { albedo }
+    pub fn new(albedo: Color, fuzziness: f64) -> Metal {
+        Metal {
+            albedo,
+            fuzziness: fuzziness.min(1.0),
+        }
     }
 }
 
@@ -22,7 +26,10 @@ impl Material for Metal {
             v - 2.0 * v.dot(n) * n
         }
         let reflected = reflect(ray.direction.unit(), hit.normal);
-        let scattered = Ray::new(hit.p, reflected);
+        let scattered = Ray::new(
+            hit.p,
+            reflected + self.fuzziness * Vec3::random_in_unit_sphere(),
+        );
         if scattered.direction.dot(hit.normal) > 0.0 {
             Some(Scatter::new(self.albedo, scattered))
         } else {
