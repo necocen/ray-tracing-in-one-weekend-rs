@@ -1,4 +1,4 @@
-use std::{fmt::Display, io, ops};
+use std::{fmt::Display, io, iter, ops};
 
 use rand::Rng;
 
@@ -188,6 +188,16 @@ impl ops::Div<f64> for Vec3 {
 impl Display for Vec3 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} {} {}", self.0[0], self.0[1], self.0[2])
+    }
+}
+
+impl iter::Sum for Vec3 {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        let mut v = Vec3::default();
+        for i in iter {
+            v += i;
+        }
+        v
     }
 }
 

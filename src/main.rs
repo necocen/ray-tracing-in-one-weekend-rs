@@ -7,6 +7,7 @@ use lambertian::Lambertian;
 use metal::Metal;
 use rand::Rng;
 use ray::Ray;
+use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
 
@@ -50,12 +51,13 @@ fn main() {
 
     println!("P3\n{image_width} {image_height}\n255");
 
-    let mut rng = rand::thread_rng();
     for j in (0..image_height).rev() {
         eprint!("\rScanlines remaining: {j}");
         for i in 0..image_width {
-            let mut c = (0..samples_per_pixel)
+            let mut c: Color = (0..samples_per_pixel)
+                .into_par_iter()
                 .map(|_| {
+                    let mut rng = rand::thread_rng();
                     let z: f64 = rng.gen();
                     let w: f64 = rng.gen();
                     let u = (i as f64 + z) / ((image_width - 1) as f64);
@@ -63,7 +65,7 @@ fn main() {
                     let ray = camera.ray(u, v);
                     ray_color(ray, &world, max_depth)
                 })
-                .fold(Color::default(), |c, d| c + d);
+                .sum();
             c /= samples_per_pixel as f64;
             _ = c.write(&mut std::io::stdout());
         }

@@ -1,6 +1,6 @@
 use crate::{hittable::HitRecord, ray::Ray, vec3::Color};
 
-pub trait Material: std::fmt::Debug {
+pub trait Material: std::fmt::Debug + Send + Sync {
     fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<Scatter>;
 }
 
