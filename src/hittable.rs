@@ -17,6 +17,7 @@ pub struct HitRecord<'a> {
 }
 
 impl<'a> HitRecord<'a> {
+    #[allow(dead_code)]
     pub fn new(
         p: Point3,
         normal: Vec3,
