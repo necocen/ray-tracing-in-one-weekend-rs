@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 
 use camera::Camera;
-use hittables::{Hittable, HittableList, Sphere};
+use hittables::{Hittable, HittableVec, Sphere};
 use materials::{Dielectric, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
@@ -87,8 +87,8 @@ fn ray_color(ray: Ray, world: &impl Hittable, depth: i32) -> Color {
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
 }
 
-fn scene() -> HittableList {
-    let mut world = HittableList::new();
+fn scene() -> HittableVec {
+    let mut world = HittableVec::new();
 
     let material_ground = Lambertian::new(Color::new(0.5, 0.5, 0.5));
     world.push(Box::new(Sphere::new(
