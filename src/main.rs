@@ -38,27 +38,27 @@ fn main() {
         Box::new(Sphere::new(
             Point3::new(0.0, -100.5, -1.0),
             100.0,
-            &material_ground,
+            material_ground,
         )),
         Box::new(Sphere::new(
             Point3::new(0.0, 0.0, -1.0),
             0.5,
-            &material_center,
+            material_center,
         )),
         Box::new(Sphere::new(
             Point3::new(-1.0, 0.0, -1.0),
             0.5,
-            &material_left,
+            material_left,
         )),
         Box::new(Sphere::new(
             Point3::new(-1.0, 0.0, -1.0),
             -0.45,
-            &material_left,
+            material_left,
         )),
         Box::new(Sphere::new(
             Point3::new(1.0, 0.0, -1.0),
             0.5,
-            &material_right,
+            material_right,
         )),
     ];
 

@@ -7,7 +7,7 @@ use crate::{
     vec3::{Color, Vec3},
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Dielectric {
     eta: f64,
 }
