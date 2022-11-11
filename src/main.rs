@@ -7,7 +7,7 @@ use lambertian::Lambertian;
 use metal::Metal;
 use rand::Rng;
 use ray::Ray;
-use rayon::prelude::{IntoParallelIterator, ParallelIterator};
+use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
 use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
 
@@ -53,20 +53,26 @@ fn main() {
 
     for j in (0..image_height).rev() {
         eprint!("\rScanlines remaining: {j}");
-        for i in 0..image_width {
-            let mut c: Color = (0..samples_per_pixel)
-                .into_par_iter()
-                .map(|_| {
-                    let mut rng = rand::thread_rng();
-                    let z: f64 = rng.gen();
-                    let w: f64 = rng.gen();
-                    let u = (i as f64 + z) / ((image_width - 1) as f64);
-                    let v = (j as f64 + w) / ((image_height - 1) as f64);
-                    let ray = camera.ray(u, v);
-                    ray_color(ray, &world, max_depth)
-                })
-                .sum();
-            c /= samples_per_pixel as f64;
+        let mut row = Vec::<Color>::with_capacity(image_width);
+        (0..image_width)
+            .into_par_iter()
+            .map(|i| {
+                let c: Color = (0..samples_per_pixel)
+                    .into_par_iter()
+                    .map(|_| {
+                        let mut rng = rand::thread_rng();
+                        let z: f64 = rng.gen();
+                        let w: f64 = rng.gen();
+                        let u = (i as f64 + z) / ((image_width - 1) as f64);
+                        let v = (j as f64 + w) / ((image_height - 1) as f64);
+                        let ray = camera.ray(u, v);
+                        ray_color(ray, &world, max_depth)
+                    })
+                    .sum();
+                c / samples_per_pixel as f64
+            })
+            .collect_into_vec(&mut row);
+        for c in row {
             _ = c.write(&mut std::io::stdout());
         }
     }
