@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::{
     hittable::HitRecord,
     material::{Material, Scatter},
@@ -25,6 +27,13 @@ impl Dielectric {
     fn reflect(v: Vec3, n: Vec3) -> Vec3 {
         v - 2.0 * v.dot(n) * n
     }
+
+    fn reflectance(cosine: f64, refraction_ratio: f64) -> f64 {
+        // Use Schlick's approximation for reflectance
+        let r0 = (1.0 - refraction_ratio) / (1.0 + refraction_ratio);
+        let r1 = r0 * r0;
+        r1 + (1.0 - r1) * (1.0 - cosine).powi(5)
+    }
 }
 
 impl Material for Dielectric {
@@ -38,7 +47,10 @@ impl Material for Dielectric {
         let cos_theta = (-unit_direction.dot(hit.normal)).min(1.0);
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
-        let direction = if cannot_refract {
+        let mut rng = rand::thread_rng();
+        let reflectance = Dielectric::reflectance(cos_theta, refraction_ratio);
+        let should_reflect = reflectance > rng.gen();
+        let direction = if cannot_refract || should_reflect {
             Dielectric::reflect(unit_direction, hit.normal)
         } else {
             Dielectric::refract(unit_direction, hit.normal, refraction_ratio)
