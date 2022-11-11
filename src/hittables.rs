@@ -1,7 +1,7 @@
-mod hit_record;
+mod hit;
 mod hittable;
 mod sphere;
 
-pub use hit_record::HitRecord;
+pub use hit::Hit;
 pub use hittable::{Hittable, HittableList};
 pub use sphere::Sphere;

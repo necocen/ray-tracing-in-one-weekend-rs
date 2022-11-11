@@ -1,6 +1,6 @@
 use crate::{materials::Material, ray::Ray, vec3::Point3};
 
-use super::{HitRecord, Hittable};
+use super::{Hit, Hittable};
 
 #[derive(Debug)]
 #[non_exhaustive]
@@ -21,7 +21,7 @@ impl<M: Material> Sphere<M> {
 }
 
 impl<M: Material> Hittable for Sphere<M> {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         let oc = ray.origin - self.center;
         let a = ray.direction.length_squared();
         let half_b = oc.dot(ray.direction);
@@ -44,7 +44,7 @@ impl<M: Material> Hittable for Sphere<M> {
 
         let p = ray.at(root);
 
-        let h = HitRecord::new_with_outward_normal(
+        let h = Hit::new_with_outward_normal(
             ray,
             root,
             (p - self.center) / self.radius,

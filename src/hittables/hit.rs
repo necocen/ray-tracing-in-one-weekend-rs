@@ -6,7 +6,7 @@ use crate::{
 
 #[derive(Debug)]
 #[non_exhaustive]
-pub struct HitRecord<'a> {
+pub struct Hit<'a> {
     pub p: Point3,
     /// The normal always point against the hitting ray
     pub normal: Vec3,
@@ -16,7 +16,7 @@ pub struct HitRecord<'a> {
     pub material: &'a dyn Material,
 }
 
-impl<'a> HitRecord<'a> {
+impl<'a> Hit<'a> {
     #[allow(dead_code)]
     pub fn new(
         p: Point3,
@@ -24,8 +24,8 @@ impl<'a> HitRecord<'a> {
         t: f64,
         front_face: bool,
         material: &'a dyn Material,
-    ) -> HitRecord<'a> {
-        HitRecord {
+    ) -> Hit<'a> {
+        Hit {
             p,
             normal,
             t,
@@ -39,14 +39,14 @@ impl<'a> HitRecord<'a> {
         t: f64,
         outward_normal: Vec3,
         material: &'a dyn Material,
-    ) -> HitRecord<'a> {
+    ) -> Hit<'a> {
         let front_face = ray.direction.dot(outward_normal) < 0.0;
         let normal = if front_face {
             outward_normal
         } else {
             -outward_normal
         };
-        HitRecord {
+        Hit {
             p: ray.at(t),
             normal,
             t,

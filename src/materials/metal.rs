@@ -1,5 +1,5 @@
 use crate::{
-    hittables::HitRecord,
+    hittables::Hit,
     ray::Ray,
     vec3::{Color, Vec3},
 };
@@ -22,7 +22,7 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<Scatter> {
+    fn scatter(&self, ray: &Ray, hit: &Hit) -> Option<Scatter> {
         fn reflect(v: Vec3, n: Vec3) -> Vec3 {
             v - 2.0 * v.dot(n) * n
         }

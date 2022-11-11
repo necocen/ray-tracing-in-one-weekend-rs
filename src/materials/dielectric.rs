@@ -1,7 +1,7 @@
 use rand::Rng;
 
 use crate::{
-    hittables::HitRecord,
+    hittables::Hit,
     ray::Ray,
     vec3::{Color, Vec3},
 };
@@ -38,7 +38,7 @@ impl Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<Scatter> {
+    fn scatter(&self, ray: &Ray, hit: &Hit) -> Option<Scatter> {
         let refraction_ratio = if hit.front_face {
             1.0 / self.eta
         } else {
