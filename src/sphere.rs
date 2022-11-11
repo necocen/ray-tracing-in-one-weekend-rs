@@ -6,23 +6,23 @@ use crate::{
 
 #[derive(Debug)]
 #[non_exhaustive]
-pub struct Sphere {
+pub struct Sphere<M: Material> {
     pub center: Point3,
     pub radius: f64,
-    pub material: Box<dyn Material>,
+    pub material: M,
 }
 
-impl Sphere {
-    pub fn new(center: Point3, radius: f64, material: impl Material + 'static) -> Sphere {
+impl<M: Material> Sphere<M> {
+    pub fn new(center: Point3, radius: f64, material: M) -> Sphere<M> {
         Sphere {
             center,
             radius,
-            material: Box::new(material),
+            material,
         }
     }
 }
 
-impl Hittable for Sphere {
+impl<M: Material> Hittable for Sphere<M> {
     fn hit(&self, ray: crate::ray::Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
         let a = ray.direction.length_squared();
@@ -50,7 +50,7 @@ impl Hittable for Sphere {
             ray,
             root,
             (p - self.center) / self.radius,
-            self.material.as_ref(),
+            &self.material,
         );
         Some(h)
     }

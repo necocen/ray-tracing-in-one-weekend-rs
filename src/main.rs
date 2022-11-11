@@ -108,20 +108,20 @@ fn scene() -> HittableList {
             );
 
             if (center - Point3::new(4.0, 0.2, 0.0)).length() > 0.9 {
-                let sphere = if choose_mat < 0.8 {
+                let sphere: Box<dyn Hittable> = if choose_mat < 0.8 {
                     // diffuse
                     let albedo = Color::random() * Color::random();
-                    Sphere::new(center, 0.2, Lambertian::new(albedo))
+                    Box::new(Sphere::new(center, 0.2, Lambertian::new(albedo)))
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = Color::random() * 0.5 + Color::new(0.5, 0.5, 0.5);
                     let fuzz = rng.gen::<f64>() * 0.5;
-                    Sphere::new(center, 0.2, Metal::new(albedo, fuzz))
+                    Box::new(Sphere::new(center, 0.2, Metal::new(albedo, fuzz)))
                 } else {
                     // glass
-                    Sphere::new(center, 0.2, Dielectric::new(1.5))
+                    Box::new(Sphere::new(center, 0.2, Dielectric::new(1.5)))
                 };
-                world.push(Box::new(sphere));
+                world.push(sphere);
             }
         }
     }
