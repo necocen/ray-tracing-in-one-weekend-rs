@@ -18,12 +18,11 @@ fn main() {
     // Image
     let aspect_ratio = 3.0 / 2.0;
     let image_width = 1200;
-    let image_height = ((image_width as f64) / aspect_ratio) as i32;
+    let image_height = ((image_width as f64) / aspect_ratio) as usize;
     let samples_per_pixel = 500;
     let max_depth = 50;
 
     // World
-
     let world = scene();
 
     // Camera
@@ -41,9 +40,34 @@ fn main() {
     );
 
     // Render
+    let image = render(
+        image_width,
+        image_height,
+        &world,
+        &camera,
+        samples_per_pixel,
+        max_depth,
+    );
 
+    // Output
     println!("P3\n{image_width} {image_height}\n255");
+    for row in image {
+        for c in row {
+            _ = c.write(&mut std::io::stdout());
+        }
+    }
+    eprint!("\nDone.\n");
+}
 
+fn render(
+    image_width: usize,
+    image_height: usize,
+    world: &impl Hittable,
+    camera: &Camera,
+    samples_per_pixel: i32,
+    max_depth: i32,
+) -> Vec<Vec<Color>> {
+    let mut image = Vec::<Vec<Color>>::with_capacity(image_height);
     for j in (0..image_height).rev() {
         eprint!("\rScanlines remaining: {j}");
         let mut row = Vec::<Color>::with_capacity(image_width);
@@ -59,17 +83,15 @@ fn main() {
                         let u = (i as f64 + z) / ((image_width - 1) as f64);
                         let v = (j as f64 + w) / ((image_height - 1) as f64);
                         let ray = camera.ray(u, v);
-                        ray_color(ray, &world, max_depth)
+                        ray_color(ray, world, max_depth)
                     })
                     .sum();
                 c / samples_per_pixel as f64
             })
             .collect_into_vec(&mut row);
-        for c in row {
-            _ = c.write(&mut std::io::stdout());
-        }
+        image.push(row);
     }
-    eprint!("\nDone.\n");
+    image
 }
 
 fn ray_color(ray: Ray, world: &impl Hittable, depth: i32) -> Color {
