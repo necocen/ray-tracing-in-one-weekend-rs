@@ -3,23 +3,23 @@ use std::{fmt::Display, io, iter, ops};
 use rand::Rng;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
-pub struct Vec3([f64; 3]);
+pub struct Vec3(f64, f64, f64);
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
-        Vec3([x, y, z])
+        Vec3(x, y, z)
     }
 
     pub fn x(self) -> f64 {
-        self.0[0]
+        self.0
     }
 
     pub fn y(self) -> f64 {
-        self.0[1]
+        self.1
     }
 
     pub fn z(self) -> f64 {
-        self.0[2]
+        self.2
     }
 
     pub fn length(self) -> f64 {
@@ -27,18 +27,18 @@ impl Vec3 {
     }
 
     pub fn length_squared(self) -> f64 {
-        self.0[0] * self.0[0] + self.0[1] * self.0[1] + self.0[2] * self.0[2]
+        self.0 * self.0 + self.1 * self.1 + self.2 * self.2
     }
 
     pub fn dot(self, rhs: Vec3) -> f64 {
-        self.0[0] * rhs.0[0] + self.0[1] * rhs.0[1] + self.0[2] * rhs.0[2]
+        self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
     }
 
     pub fn cross(self, rhs: Vec3) -> Vec3 {
         Vec3::new(
-            self.0[1] * rhs.0[2] - self.0[2] * rhs.0[1],
-            self.0[2] * rhs.0[0] - self.0[0] * rhs.0[2],
-            self.0[0] * rhs.0[1] - self.0[1] * rhs.0[0],
+            self.1 * rhs.2 - self.2 * rhs.1,
+            self.2 * rhs.0 - self.0 * rhs.2,
+            self.0 * rhs.1 - self.1 * rhs.0,
         )
     }
 
@@ -76,38 +76,38 @@ impl Vec3 {
 
     pub fn is_near_zero(&self) -> bool {
         let s = 1e-8;
-        self.0[0].abs() < s && self.0[1].abs() < s && self.0[2].abs() < s
+        self.0.abs() < s && self.1.abs() < s && self.2.abs() < s
     }
 }
 
 impl ops::Neg for Vec3 {
     type Output = Vec3;
     fn neg(self) -> Self::Output {
-        Vec3([-self.0[0], -self.0[1], -self.0[2]])
+        Vec3(-self.0, -self.1, -self.2)
     }
 }
 
 impl ops::AddAssign for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
-        self.0[0] += rhs.0[0];
-        self.0[1] += rhs.0[1];
-        self.0[2] += rhs.0[2];
+        self.0 += rhs.0;
+        self.1 += rhs.1;
+        self.2 += rhs.2;
     }
 }
 
 impl ops::MulAssign<f64> for Vec3 {
     fn mul_assign(&mut self, rhs: f64) {
-        self.0[0] *= rhs;
-        self.0[1] *= rhs;
-        self.0[2] *= rhs;
+        self.0 *= rhs;
+        self.1 *= rhs;
+        self.2 *= rhs;
     }
 }
 
 impl ops::DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, rhs: f64) {
-        self.0[0] /= rhs;
-        self.0[1] /= rhs;
-        self.0[2] /= rhs;
+        self.0 /= rhs;
+        self.1 /= rhs;
+        self.2 /= rhs;
     }
 }
 
@@ -115,13 +115,23 @@ impl ops::Index<usize> for Vec3 {
     type Output = f64;
 
     fn index(&self, index: usize) -> &Self::Output {
-        &self.0[index]
+        match index {
+            0 => &self.0,
+            1 => &self.1,
+            2 => &self.2,
+            _ => panic!("out of index"),
+        }
     }
 }
 
 impl ops::IndexMut<usize> for Vec3 {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        &mut self.0[index]
+        match index {
+            0 => &mut self.0,
+            1 => &mut self.1,
+            2 => &mut self.2,
+            _ => panic!("out of index"),
+        }
     }
 }
 
@@ -129,11 +139,7 @@ impl ops::Add for Vec3 {
     type Output = Vec3;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Vec3::new(
-            self.0[0] + rhs.0[0],
-            self.0[1] + rhs.0[1],
-            self.0[2] + rhs.0[2],
-        )
+        Vec3::new(self.0 + rhs.0, self.1 + rhs.1, self.2 + rhs.2)
     }
 }
 
@@ -141,11 +147,7 @@ impl ops::Sub for Vec3 {
     type Output = Vec3;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        Vec3::new(
-            self.0[0] - rhs.0[0],
-            self.0[1] - rhs.0[1],
-            self.0[2] - rhs.0[2],
-        )
+        Vec3::new(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2)
     }
 }
 
@@ -153,11 +155,7 @@ impl ops::Mul for Vec3 {
     type Output = Vec3;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        Vec3::new(
-            self.0[0] * rhs.0[0],
-            self.0[1] * rhs.0[1],
-            self.0[2] * rhs.0[2],
-        )
+        Vec3::new(self.0 * rhs.0, self.1 * rhs.1, self.2 * rhs.2)
     }
 }
 
@@ -165,7 +163,7 @@ impl ops::Mul<f64> for Vec3 {
     type Output = Vec3;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Vec3::new(self.0[0] * rhs, self.0[1] * rhs, self.0[2] * rhs)
+        Vec3::new(self.0 * rhs, self.1 * rhs, self.2 * rhs)
     }
 }
 
@@ -173,7 +171,7 @@ impl ops::Mul<Vec3> for f64 {
     type Output = Vec3;
 
     fn mul(self, rhs: Vec3) -> Self::Output {
-        Vec3::new(rhs.0[0] * self, rhs.0[1] * self, rhs.0[2] * self)
+        Vec3::new(rhs.0 * self, rhs.1 * self, rhs.2 * self)
     }
 }
 
@@ -181,13 +179,13 @@ impl ops::Div<f64> for Vec3 {
     type Output = Vec3;
 
     fn div(self, rhs: f64) -> Self::Output {
-        Vec3::new(self.0[0] / rhs, self.0[1] / rhs, self.0[2] / rhs)
+        Vec3::new(self.0 / rhs, self.1 / rhs, self.2 / rhs)
     }
 }
 
 impl Display for Vec3 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {} {}", self.0[0], self.0[1], self.0[2])
+        write!(f, "{} {} {}", self.0, self.1, self.2)
     }
 }
 
@@ -206,23 +204,14 @@ pub type Color = Vec3;
 
 impl Color {
     pub fn write(self, w: &mut impl io::Write) -> io::Result<()> {
-        fn clamp(x: f64, min: f64, max: f64) -> f64 {
-            if x < min {
-                min
-            } else if x > max {
-                max
-            } else {
-                x
-            }
-        }
-        // gamma-correct for gamma = 2.0
-        let r = self.x().sqrt();
-        let g = self.y().sqrt();
-        let b = self.z().sqrt();
+        let r = self.x().sqrt().clamp(0.0, 0.999);
+        let g = self.y().sqrt().clamp(0.0, 0.999);
+        let b = self.z().sqrt().clamp(0.0, 0.999);
+
         // Write the translated [0,255] value of each color component.
-        let r = (255.999 * clamp(r, 0.0, 0.999)) as i32;
-        let g = (255.999 * clamp(g, 0.0, 0.999)) as i32;
-        let b = (255.999 * clamp(b, 0.0, 0.999)) as i32;
+        let r = (255.999 * r) as i32;
+        let g = (255.999 * g) as i32;
+        let b = (255.999 * b) as i32;
         writeln!(w, "{r} {g} {b}")
     }
 }
