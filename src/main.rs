@@ -69,7 +69,7 @@ fn render(
 ) -> Vec<Vec<Color>> {
     let mut image = Vec::<Vec<Color>>::with_capacity(image_height);
     for j in (0..image_height).rev() {
-        eprint!("\rScanlines remaining: {j}");
+        eprint!("\rScanlines remaining: {j:>3}");
         let mut row = Vec::<Color>::with_capacity(image_width);
         (0..image_width)
             .into_par_iter()
