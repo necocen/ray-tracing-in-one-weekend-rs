@@ -413,7 +413,7 @@ mod tests {
         let color = Color::new(0.25, 0.25, 0.5);
         color.write(&mut buf)?;
 
-        assert_eq!("63 63 127\n", String::from_utf8_lossy(&buf));
+        assert_eq!("127 127 181\n", String::from_utf8_lossy(&buf));
         Ok(())
     }
 }
