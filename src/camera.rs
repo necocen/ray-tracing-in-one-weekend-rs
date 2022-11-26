@@ -102,7 +102,11 @@ impl Camera {
         let rd = self.lens_radius * Vec3::random_in_unit_disk();
         let offset = self.u * rd.x() + self.v * rd.y();
         let mut rng = rand::thread_rng();
-        let time = rng.gen_range(self.time0..self.time1);
+        let time = if self.time0 == self.time1 {
+            self.time0
+        } else {
+            rng.gen_range(self.time0..self.time1)
+        };
         Ray::new(
             self.origin + offset,
             self.lower_left_corner + u * self.horizontal + v * self.vertical - self.origin - offset,
