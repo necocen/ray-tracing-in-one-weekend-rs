@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::{
     ray::Ray,
     vec3::{Point3, Vec3},
@@ -14,6 +16,8 @@ pub struct Camera {
     #[allow(dead_code)]
     w: Vec3,
     lens_radius: f64,
+    time0: f64,
+    time1: f64,
 }
 
 impl Camera {
@@ -32,6 +36,40 @@ impl Camera {
         aspect_ratio: f64,
         aperture: f64,
         focus_dist: f64,
+    ) -> Camera {
+        Self::new_with_time(
+            look_from,
+            look_at,
+            v_up,
+            theta,
+            aspect_ratio,
+            aperture,
+            focus_dist,
+            0.0,
+            0.0,
+        )
+    }
+
+    /// - `look_from` - point that camera is looking from
+    /// - `look_at` - point that camera is looking at
+    /// - `v_up` - 'up' direction of camera
+    /// - `theta` - vertical field-of-view in radians
+    /// - `aspect_Ratio` - aspect ratio of viewport
+    /// - `aperture` - diameter of aperture
+    /// - `focus_dist` - ???
+    /// - `time0` - shutter open time
+    /// - `time1` - shutter close time
+    #[allow(clippy::too_many_arguments)]
+    pub fn new_with_time(
+        look_from: Point3,
+        look_at: Point3,
+        v_up: Vec3,
+        theta: f64,
+        aspect_ratio: f64,
+        aperture: f64,
+        focus_dist: f64,
+        time0: f64,
+        time1: f64,
     ) -> Camera {
         let h = (theta / 2.0).tan();
         let viewport_height = h * 2.0;
@@ -55,15 +93,20 @@ impl Camera {
             v,
             w,
             lens_radius: aperture / 2.0,
+            time0,
+            time1,
         }
     }
 
     pub fn ray(&self, u: f64, v: f64) -> Ray {
         let rd = self.lens_radius * Vec3::random_in_unit_disk();
         let offset = self.u * rd.x() + self.v * rd.y();
-        Ray::new(
+        let mut rng = rand::thread_rng();
+        let time = rng.gen_range(self.time0..self.time1);
+        Ray::new_with_time(
             self.origin + offset,
             self.lower_left_corner + u * self.horizontal + v * self.vertical - self.origin - offset,
+            time,
         )
     }
 }
