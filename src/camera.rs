@@ -103,7 +103,7 @@ impl Camera {
         let offset = self.u * rd.x() + self.v * rd.y();
         let mut rng = rand::thread_rng();
         let time = rng.gen_range(self.time0..self.time1);
-        Ray::new_with_time(
+        Ray::new(
             self.origin + offset,
             self.lower_left_corner + u * self.horizontal + v * self.vertical - self.origin - offset,
             time,

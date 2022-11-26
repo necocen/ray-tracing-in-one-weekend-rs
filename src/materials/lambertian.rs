@@ -25,7 +25,7 @@ impl Material for Lambertian {
         }
         Some(Scatter {
             attenuation: self.albedo,
-            ray: Ray::new_with_time(hit.p, scatter_direction, ray.time),
+            ray: Ray::new(hit.p, scatter_direction, ray.time),
         })
     }
 }

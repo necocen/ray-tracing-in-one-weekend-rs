@@ -9,15 +9,7 @@ pub struct Ray {
 }
 
 impl Ray {
-    pub fn new(origin: Vec3, direction: Vec3) -> Ray {
-        Ray {
-            origin,
-            direction,
-            time: 0.0,
-        }
-    }
-
-    pub fn new_with_time(origin: Vec3, direction: Vec3, time: f64) -> Ray {
+    pub fn new(origin: Vec3, direction: Vec3, time: f64) -> Ray {
         Ray {
             origin,
             direction,
@@ -38,7 +30,11 @@ mod tests {
 
     #[test]
     fn test_at() {
-        let ray = Ray::new(Vec3::new(1f64, 2f64, 3f64), Vec3::new(4f64, 5f64, 6f64));
+        let ray = Ray::new(
+            Vec3::new(1f64, 2f64, 3f64),
+            Vec3::new(4f64, 5f64, 6f64),
+            0.0,
+        );
 
         let v0 = Vec3::new(1f64, 2f64, 3f64);
         let v1 = Vec3::new(5f64, 7f64, 9f64);
