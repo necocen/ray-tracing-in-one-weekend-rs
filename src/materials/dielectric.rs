@@ -58,7 +58,7 @@ impl Material for Dielectric {
         };
         Some(Scatter::new(
             Color::new(1.0, 1.0, 1.0),
-            Ray::new(hit.p, direction),
+            Ray::new_with_time(hit.p, direction, ray.time),
         ))
     }
 }

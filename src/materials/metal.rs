@@ -27,9 +27,10 @@ impl Material for Metal {
             v - 2.0 * v.dot(n) * n
         }
         let reflected = reflect(ray.direction.unit(), hit.normal);
-        let scattered = Ray::new(
+        let scattered = Ray::new_with_time(
             hit.p,
             reflected + self.fuzziness * Vec3::random_in_unit_sphere(),
+            ray.time,
         );
         if scattered.direction.dot(hit.normal) > 0.0 {
             Some(Scatter::new(self.albedo, scattered))
