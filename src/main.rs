@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 
 use camera::Camera;
-use hittables::{Hittable, HittableVec, Sphere};
+use hittables::{Hittable, HittableVec, MovingSphere, Sphere};
 use materials::{Dielectric, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
@@ -16,10 +16,10 @@ mod vec3;
 
 fn main() {
     // Image
-    let aspect_ratio = 3.0 / 2.0;
-    let image_width = 1200;
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
     let image_height = ((image_width as f64) / aspect_ratio) as usize;
-    let samples_per_pixel = 500;
+    let samples_per_pixel = 100;
     let max_depth = 50;
 
     // World
@@ -29,7 +29,7 @@ fn main() {
     let look_from = Point3::new(13.0, 2.0, 3.0);
     let look_at = Point3::new(0.0, 0.0, 0.0);
     let v_up = Vec3::new(0.0, 1.0, 0.0);
-    let camera = Camera::new(
+    let camera = Camera::new_with_time(
         look_from,
         look_at,
         v_up,
@@ -37,6 +37,8 @@ fn main() {
         aspect_ratio,
         0.1,
         10.0,
+        0.0,
+        1.0,
     );
 
     // Render
@@ -134,7 +136,15 @@ fn scene() -> HittableVec {
                 let sphere: Box<dyn Hittable> = if choose_mat < 0.8 {
                     // diffuse
                     let albedo = Color::random() * Color::random();
-                    Box::new(Sphere::new(center, 0.2, Lambertian::new(albedo)))
+                    let center2 = center + Vec3::new(0.0, rng.gen_range(0.0..0.5), 0.0);
+                    Box::new(MovingSphere::new(
+                        center,
+                        center2,
+                        0.0,
+                        1.0,
+                        0.2,
+                        Lambertian::new(albedo),
+                    ))
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = Color::random() * 0.5 + Color::new(0.5, 0.5, 0.5);
