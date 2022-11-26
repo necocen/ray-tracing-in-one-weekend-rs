@@ -28,39 +28,10 @@ impl Camera {
     /// - `aspect_Ratio` - aspect ratio of viewport
     /// - `aperture` - diameter of aperture
     /// - `focus_dist` - ???
-    pub fn new(
-        look_from: Point3,
-        look_at: Point3,
-        v_up: Vec3,
-        theta: f64,
-        aspect_ratio: f64,
-        aperture: f64,
-        focus_dist: f64,
-    ) -> Camera {
-        Self::new_with_time(
-            look_from,
-            look_at,
-            v_up,
-            theta,
-            aspect_ratio,
-            aperture,
-            focus_dist,
-            0.0,
-            0.0,
-        )
-    }
-
-    /// - `look_from` - point that camera is looking from
-    /// - `look_at` - point that camera is looking at
-    /// - `v_up` - 'up' direction of camera
-    /// - `theta` - vertical field-of-view in radians
-    /// - `aspect_Ratio` - aspect ratio of viewport
-    /// - `aperture` - diameter of aperture
-    /// - `focus_dist` - ???
     /// - `time0` - shutter open time
     /// - `time1` - shutter close time
     #[allow(clippy::too_many_arguments)]
-    pub fn new_with_time(
+    pub fn new(
         look_from: Point3,
         look_at: Point3,
         v_up: Vec3,

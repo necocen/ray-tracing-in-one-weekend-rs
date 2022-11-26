@@ -29,7 +29,7 @@ fn main() {
     let look_from = Point3::new(13.0, 2.0, 3.0);
     let look_at = Point3::new(0.0, 0.0, 0.0);
     let v_up = Vec3::new(0.0, 1.0, 0.0);
-    let camera = Camera::new_with_time(
+    let camera = Camera::new(
         look_from,
         look_at,
         v_up,
