@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 
 use camera::Camera;
-use hittables::{BvhNode, Hittable, HittableVec, MovingSphere, Sphere};
+use hittables::{BvhTree, Hittable, HittableVec, MovingSphere, Sphere};
 use materials::{Dielectric, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
@@ -24,7 +24,7 @@ fn main() {
 
     // World
     let mut world = scene();
-    let world = BvhNode::new(&mut world, 0.0, 1.0);
+    let world = BvhTree::new(&mut world, 0.0, 1.0);
 
     // Camera
     let look_from = Point3::new(13.0, 2.0, 3.0);
