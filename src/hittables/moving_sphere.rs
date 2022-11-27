@@ -1,6 +1,10 @@
-use crate::{materials::Material, ray::Ray, vec3::Point3};
+use crate::{
+    materials::Material,
+    ray::Ray,
+    vec3::{Point3, Vec3},
+};
 
-use super::{Hit, Hittable};
+use super::{Aabb, Hit, Hittable};
 
 #[derive(Debug)]
 #[non_exhaustive]
@@ -69,5 +73,17 @@ impl<M: Material> Hittable for MovingSphere<M> {
             &self.material,
         );
         Some(h)
+    }
+
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<Aabb> {
+        let box0 = Aabb::new(
+            self.center_at(time0) - Vec3::new(self.radius, self.radius, self.radius),
+            self.center_at(time0) + Vec3::new(self.radius, self.radius, self.radius),
+        );
+        let box1 = Aabb::new(
+            self.center_at(time1) - Vec3::new(self.radius, self.radius, self.radius),
+            self.center_at(time1) + Vec3::new(self.radius, self.radius, self.radius),
+        );
+        Some(box0.union(&box1))
     }
 }
