@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 
 use camera::Camera;
-use hittables::{Hittable, HittableVec, MovingSphere, Sphere};
+use hittables::{BvhNode, Hittable, HittableVec, MovingSphere, Sphere};
 use materials::{Dielectric, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
@@ -23,7 +23,8 @@ fn main() {
     let max_depth = 50;
 
     // World
-    let world = scene();
+    let mut world = scene();
+    let world = BvhNode::new(&mut world, 0.0, 1.0);
 
     // Camera
     let look_from = Point3::new(13.0, 2.0, 3.0);
