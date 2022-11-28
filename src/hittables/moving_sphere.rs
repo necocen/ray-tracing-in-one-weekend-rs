@@ -69,6 +69,8 @@ impl<M: Material> Hittable for MovingSphere<M> {
         let h = Hit::new_with_outward_normal(
             ray,
             root,
+            0.0,
+            0.0,
             (p - self.center_at(ray.time)) / self.radius,
             &self.material,
         );

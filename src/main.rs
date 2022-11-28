@@ -116,7 +116,7 @@ fn ray_color(ray: Ray, world: &impl Hittable, depth: i32) -> Color {
 fn scene() -> HittableVec {
     let mut world = HittableVec::new();
 
-    let material_ground = Lambertian::new(Color::new(0.5, 0.5, 0.5));
+    let material_ground = Lambertian::new_with_color(Color::new(0.5, 0.5, 0.5));
     world.push(Box::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -145,7 +145,7 @@ fn scene() -> HittableVec {
                         0.0,
                         1.0,
                         0.2,
-                        Lambertian::new(albedo),
+                        Lambertian::new_with_color(albedo),
                     ))
                 } else if choose_mat < 0.95 {
                     // metal
@@ -162,7 +162,7 @@ fn scene() -> HittableVec {
     }
 
     let material1 = Dielectric::new(1.5);
-    let material2 = Lambertian::new(Color::new(0.4, 0.2, 0.1));
+    let material2 = Lambertian::new_with_color(Color::new(0.4, 0.2, 0.1));
     let material3 = Metal::new(Color::new(0.7, 0.6, 0.5), 0.0);
     world.push(Box::new(Sphere::new(
         Point3::new(0.0, 1.0, 0.0),

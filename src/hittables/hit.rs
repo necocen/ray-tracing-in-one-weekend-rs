@@ -24,6 +24,8 @@ impl<'a> Hit<'a> {
         p: Point3,
         normal: Vec3,
         t: f64,
+        u: f64,
+        v: f64,
         front_face: bool,
         material: &'a dyn Material,
     ) -> Hit<'a> {
@@ -31,8 +33,8 @@ impl<'a> Hit<'a> {
             p,
             normal,
             t,
-            u: 0.0,
-            v: 0.0,
+            u,
+            v,
             front_face,
             material,
         }
@@ -41,6 +43,8 @@ impl<'a> Hit<'a> {
     pub fn new_with_outward_normal(
         ray: Ray,
         t: f64,
+        u: f64,
+        v: f64,
         outward_normal: Vec3,
         material: &'a dyn Material,
     ) -> Hit<'a> {
@@ -54,8 +58,8 @@ impl<'a> Hit<'a> {
             p: ray.at(t),
             normal,
             t,
-            u: 0.0,
-            v: 0.0,
+            u,
+            v,
             front_face,
             material,
         }
