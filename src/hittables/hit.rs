@@ -4,7 +4,6 @@ use crate::{
     vec3::{Point3, Vec3},
 };
 
-#[derive(Debug)]
 #[non_exhaustive]
 pub struct Hit<'a> {
     pub p: Point3,

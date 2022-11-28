@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 use crate::{
     hittables::Hit,
     ray::Ray,
@@ -10,7 +8,7 @@ use crate::{
 use super::{Material, Scatter};
 
 #[derive(Debug, Clone, Copy)]
-pub struct Lambertian<T: Texture + Debug> {
+pub struct Lambertian<T: Texture> {
     albedo: T,
 }
 
@@ -21,13 +19,13 @@ impl Lambertian<SolidColor> {
     }
 }
 
-impl<T: Texture + Debug> Lambertian<T> {
+impl<T: Texture> Lambertian<T> {
     pub fn new(albedo: T) -> Lambertian<T> {
         Lambertian { albedo }
     }
 }
 
-impl<T: Texture + Debug> Material for Lambertian<T> {
+impl<T: Texture> Material for Lambertian<T> {
     fn scatter(&self, ray: &Ray, hit: &Hit) -> Option<Scatter> {
         let mut scatter_direction = hit.normal + Vec3::random_in_unit_sphere().unit();
         if scatter_direction.is_near_zero() {

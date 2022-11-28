@@ -6,7 +6,6 @@ use crate::ray::Ray;
 
 use super::{Aabb, Hit, Hittable};
 
-#[derive(Debug)]
 #[non_exhaustive]
 pub enum BvhTree<'a> {
     Leaf {
