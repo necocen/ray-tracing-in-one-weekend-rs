@@ -25,20 +25,28 @@ fn main() {
     let max_depth = 50;
 
     // World
-    let mut world = scene();
+    // let mut world = random_scene();
+    // let aperture = 0.1;
+    // let theta = PI * 20.0 / 180.0;
+    // let look_from = Point3::new(13.0, 2.0, 3.0);
+    // let look_at = Point3::new(0.0, 0.0, 0.0);
+    let mut world = two_spheres();
+    let aperture = 0.0;
+    let theta = PI * 20.0 / 180.0;
+    let look_from = Point3::new(13.0, 2.0, 3.0);
+    let look_at = Point3::new(0.0, 0.0, 0.0);
+
     let world = BvhTree::new(&mut world, 0.0, 1.0);
 
     // Camera
-    let look_from = Point3::new(13.0, 2.0, 3.0);
-    let look_at = Point3::new(0.0, 0.0, 0.0);
     let v_up = Vec3::new(0.0, 1.0, 0.0);
     let camera = Camera::new(
         look_from,
         look_at,
         v_up,
-        PI * 20.0 / 180.0,
+        theta,
         aspect_ratio,
-        0.1,
+        aperture,
         10.0,
         0.0,
         1.0,
@@ -114,7 +122,7 @@ fn ray_color(ray: Ray, world: &impl Hittable, depth: i32) -> Color {
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
 }
 
-fn scene() -> HittableVec {
+fn random_scene() -> HittableVec {
     let mut world = HittableVec::new();
 
     let checker =
@@ -181,6 +189,25 @@ fn scene() -> HittableVec {
         Point3::new(4.0, 1.0, 0.0),
         1.0,
         material3,
+    )));
+
+    world
+}
+
+fn two_spheres() -> HittableVec {
+    let mut world = HittableVec::new();
+
+    let checker =
+        CheckerTexture::new_with_colors(Color::new(0.2, 0.3, 0.1), Color::new(0.9, 0.9, 0.9));
+    world.push(Box::new(Sphere::new(
+        Point3::new(0.0, -10.0, 0.0),
+        10.0,
+        Lambertian::new(checker.clone()),
+    )));
+    world.push(Box::new(Sphere::new(
+        Point3::new(0.0, 10.0, 0.0),
+        10.0,
+        Lambertian::new(checker),
     )));
 
     world
