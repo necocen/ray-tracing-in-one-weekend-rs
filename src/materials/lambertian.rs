@@ -21,6 +21,12 @@ impl Lambertian<SolidColor> {
     }
 }
 
+impl<T: Texture + Debug> Lambertian<T> {
+    pub fn new(albedo: T) -> Lambertian<T> {
+        Lambertian { albedo }
+    }
+}
+
 impl<T: Texture + Debug> Material for Lambertian<T> {
     fn scatter(&self, ray: &Ray, hit: &Hit) -> Option<Scatter> {
         let mut scatter_direction = hit.normal + Vec3::random_in_unit_sphere().unit();

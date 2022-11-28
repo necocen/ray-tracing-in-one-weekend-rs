@@ -6,6 +6,7 @@ use materials::{Dielectric, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
 use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
+use textures::CheckerTexture;
 use vec3::{Color, Point3, Vec3};
 
 mod camera;
@@ -116,7 +117,9 @@ fn ray_color(ray: Ray, world: &impl Hittable, depth: i32) -> Color {
 fn scene() -> HittableVec {
     let mut world = HittableVec::new();
 
-    let material_ground = Lambertian::new_with_color(Color::new(0.5, 0.5, 0.5));
+    let checker =
+        CheckerTexture::new_with_colors(Color::new(0.2, 0.3, 0.1), Color::new(0.9, 0.9, 0.9));
+    let material_ground = Lambertian::new(checker);
     world.push(Box::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
         1000.0,
