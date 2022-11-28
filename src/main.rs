@@ -12,6 +12,7 @@ mod camera;
 mod hittables;
 mod materials;
 mod ray;
+mod textures;
 mod vec3;
 
 fn main() {

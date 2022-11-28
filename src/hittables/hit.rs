@@ -11,6 +11,8 @@ pub struct Hit<'a> {
     /// The normal always point against the hitting ray
     pub normal: Vec3,
     pub t: f64,
+    pub u: f64,
+    pub v: f64,
     /// True if hitting ray is outgoing to surface
     pub front_face: bool,
     pub material: &'a dyn Material,
@@ -29,6 +31,8 @@ impl<'a> Hit<'a> {
             p,
             normal,
             t,
+            u: 0.0,
+            v: 0.0,
             front_face,
             material,
         }
@@ -50,6 +54,8 @@ impl<'a> Hit<'a> {
             p: ray.at(t),
             normal,
             t,
+            u: 0.0,
+            v: 0.0,
             front_face,
             material,
         }
