@@ -32,21 +32,31 @@ fn main() {
     // let theta = PI * 20.0 / 180.0;
     // let look_from = Point3::new(13.0, 2.0, 3.0);
     // let look_at = Point3::new(0.0, 0.0, 0.0);
+    // let background = Color::new(0.7, 0.8, 1.0);
     // let mut world = two_spheres();
     // let aperture = 0.0;
     // let theta = PI * 20.0 / 180.0;
     // let look_from = Point3::new(13.0, 2.0, 3.0);
     // let look_at = Point3::new(0.0, 0.0, 0.0);
+    // let background = Color::new(0.7, 0.8, 1.0);
     // let mut world = two_perlin_spheres();
     // let aperture = 0.0;
     // let theta = PI * 20.0 / 180.0;
     // let look_from = Point3::new(13.0, 2.0, 3.0);
     // let look_at = Point3::new(0.0, 0.0, 0.0);
+    // let background = Color::new(0.7, 0.8, 1.0);
+    // let mut world = earth();
+    // let aperture = 0.0;
+    // let theta = PI * 20.0 / 180.0;
+    // let look_from = Point3::new(13.0, 2.0, 3.0);
+    // let look_at = Point3::new(0.0, 0.0, 0.0);
+    // let background = Color::new(0.7, 0.8, 1.0);
     let mut world = earth();
     let aperture = 0.0;
     let theta = PI * 20.0 / 180.0;
     let look_from = Point3::new(13.0, 2.0, 3.0);
     let look_at = Point3::new(0.0, 0.0, 0.0);
+    let background = Color::new(0.0, 0.0, 0.0);
 
     let world = BvhTree::new(&mut world, 0.0, 1.0);
 
@@ -70,6 +80,7 @@ fn main() {
         image_height,
         &world,
         &camera,
+        background,
         samples_per_pixel,
         max_depth,
     );
@@ -89,6 +100,7 @@ fn render(
     image_height: usize,
     world: &impl Hittable,
     camera: &Camera,
+    background: Color,
     samples_per_pixel: i32,
     max_depth: i32,
 ) -> Vec<Vec<Color>> {
@@ -108,7 +120,7 @@ fn render(
                         let u = (i as f64 + z) / ((image_width - 1) as f64);
                         let v = (j as f64 + w) / ((image_height - 1) as f64);
                         let ray = camera.ray(u, v);
-                        ray_color(ray, world, max_depth)
+                        ray_color(ray, background, world, max_depth)
                     })
                     .sum();
                 c / samples_per_pixel as f64
@@ -119,19 +131,20 @@ fn render(
     image
 }
 
-fn ray_color(ray: Ray, world: &impl Hittable, depth: i32) -> Color {
+fn ray_color(ray: Ray, background: Color, world: &impl Hittable, depth: i32) -> Color {
     if depth <= 0 {
         return Color::default();
     }
-    if let Some(hit) = world.hit(ray, 0.001, f64::INFINITY) {
-        if let Some(scatter) = hit.material.scatter(&ray, &hit) {
-            return scatter.attenuation * ray_color(scatter.ray, world, depth - 1);
-        } else {
-            return Color::default();
-        }
-    }
-    let t = 0.5 * (ray.direction.unit().y() + 1.0);
-    (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
+
+    let Some(hit) = world.hit(ray, 0.001, f64::INFINITY) else {
+        return background;
+    };
+    let emitted = hit.material.emitted(hit.u, hit.v, &hit.p);
+    let Some(scatter) = hit.material.scatter(&ray, &hit) else {
+        return emitted;
+    };
+
+    emitted + scatter.attenuation * ray_color(scatter.ray, background, world, depth - 1)
 }
 
 fn random_scene() -> HittableVec {
