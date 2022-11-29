@@ -6,7 +6,7 @@ use materials::{Dielectric, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
 use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
-use textures::{CheckerTexture, NoiseTexture};
+use textures::{CheckerTexture, ImageTexture, NoiseTexture};
 use vec3::{Color, Point3, Vec3};
 
 mod camera;
@@ -35,7 +35,12 @@ fn main() {
     // let theta = PI * 20.0 / 180.0;
     // let look_from = Point3::new(13.0, 2.0, 3.0);
     // let look_at = Point3::new(0.0, 0.0, 0.0);
-    let mut world = two_perlin_spheres();
+    // let mut world = two_perlin_spheres();
+    // let aperture = 0.0;
+    // let theta = PI * 20.0 / 180.0;
+    // let look_from = Point3::new(13.0, 2.0, 3.0);
+    // let look_at = Point3::new(0.0, 0.0, 0.0);
+    let mut world = earth();
     let aperture = 0.0;
     let theta = PI * 20.0 / 180.0;
     let look_from = Point3::new(13.0, 2.0, 3.0);
@@ -232,6 +237,18 @@ fn two_perlin_spheres() -> HittableVec {
         2.0,
         Lambertian::new(perlin),
     )));
+
+    world
+}
+
+fn earth() -> HittableVec {
+    let mut world = HittableVec::new();
+
+    let earth_texture = ImageTexture::new_with_filename("./earthmap.jpg").unwrap();
+    let earth_surface = Lambertian::new(earth_texture);
+    let globe = Sphere::new(Point3::default(), 2.0, earth_surface);
+
+    world.push(Box::new(globe));
 
     world
 }
