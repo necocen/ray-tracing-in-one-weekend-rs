@@ -40,10 +40,36 @@ impl Perlin {
     }
 
     pub fn noise_at(&self, p: &Point3) -> f64 {
-        let i = (4.0 * p.x().abs()) as usize & 0xff;
-        let j = (4.0 * p.y().abs()) as usize & 0xff;
-        let k = (4.0 * p.z().abs()) as usize & 0xff;
+        let u = p.x().abs().fract();
+        let v = p.y().abs().fract();
+        let w = p.z().abs().fract();
+        let i = (p.x().abs()) as usize;
+        let j = (p.y().abs()) as usize;
+        let k = (p.z().abs()) as usize;
+        let mut c = [[[0.0; 2]; 2]; 2];
+        (0..2).for_each(|di| {
+            (0..2).for_each(|dj| {
+                (0..2).for_each(|dk| {
+                    c[di][dj][dk] = self.rand_float[self.perm_x[(i + di) & 0xff]
+                        ^ self.perm_y[(j + dj) & 0xff]
+                        ^ self.perm_z[(k + dk) & 0xff]]
+                });
+            });
+        });
 
-        self.rand_float[self.perm_x[i] ^ self.perm_y[j] ^ self.perm_z[k]]
+        Self::trilinear_interpolation(c, u, v, w)
+    }
+
+    fn trilinear_interpolation(c: [[[f64; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
+        (0..2).fold(0.0, |acc, i| {
+            acc + (0..2).fold(0.0, move |acc, j| {
+                acc + (0..2).fold(0.0, move |acc, k| {
+                    acc + (i as f64 * u + ((1 - i) as f64) * (1.0 - u))
+                        * (j as f64 * v + ((1 - j) as f64) * (1.0 - v))
+                        * (k as f64 * w + ((1 - k) as f64) * (1.0 - w))
+                        * c[i][j][k]
+                })
+            })
+        })
     }
 }
