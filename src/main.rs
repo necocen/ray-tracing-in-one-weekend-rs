@@ -221,7 +221,7 @@ fn two_spheres() -> HittableVec {
 fn two_perlin_spheres() -> HittableVec {
     let mut world = HittableVec::new();
 
-    let perlin = NoiseTexture::new();
+    let perlin = NoiseTexture::new_with_scale(4.0);
     world.push(Box::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
         1000.0,

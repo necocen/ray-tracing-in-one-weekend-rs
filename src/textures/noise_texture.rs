@@ -5,18 +5,27 @@ use super::{perlin::Perlin, Texture};
 #[derive(Debug, Clone)]
 pub struct NoiseTexture {
     noise: Perlin,
+    scale: f64,
 }
 
 impl NoiseTexture {
     pub fn new() -> NoiseTexture {
         NoiseTexture {
             noise: Perlin::new(),
+            scale: 1.0,
+        }
+    }
+
+    pub fn new_with_scale(scale: f64) -> NoiseTexture {
+        NoiseTexture {
+            noise: Perlin::new(),
+            scale,
         }
     }
 }
 
 impl Texture for NoiseTexture {
     fn value(&self, _u: f64, _v: f64, p: &Point3) -> Color {
-        Color::new(1.0, 1.0, 1.0) * self.noise.noise_at(p)
+        Color::new(1.0, 1.0, 1.0) * self.noise.noise_at(&(self.scale * *p))
     }
 }
