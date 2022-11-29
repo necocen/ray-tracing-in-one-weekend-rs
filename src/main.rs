@@ -6,7 +6,7 @@ use materials::{Dielectric, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
 use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
-use textures::CheckerTexture;
+use textures::{CheckerTexture, NoiseTexture};
 use vec3::{Color, Point3, Vec3};
 
 mod camera;
@@ -30,7 +30,12 @@ fn main() {
     // let theta = PI * 20.0 / 180.0;
     // let look_from = Point3::new(13.0, 2.0, 3.0);
     // let look_at = Point3::new(0.0, 0.0, 0.0);
-    let mut world = two_spheres();
+    // let mut world = two_spheres();
+    // let aperture = 0.0;
+    // let theta = PI * 20.0 / 180.0;
+    // let look_from = Point3::new(13.0, 2.0, 3.0);
+    // let look_at = Point3::new(0.0, 0.0, 0.0);
+    let mut world = two_perlin_spheres();
     let aperture = 0.0;
     let theta = PI * 20.0 / 180.0;
     let look_from = Point3::new(13.0, 2.0, 3.0);
@@ -208,6 +213,24 @@ fn two_spheres() -> HittableVec {
         Point3::new(0.0, 10.0, 0.0),
         10.0,
         Lambertian::new(checker),
+    )));
+
+    world
+}
+
+fn two_perlin_spheres() -> HittableVec {
+    let mut world = HittableVec::new();
+
+    let perlin = NoiseTexture::new();
+    world.push(Box::new(Sphere::new(
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Lambertian::new(perlin.clone()),
+    )));
+    world.push(Box::new(Sphere::new(
+        Point3::new(0.0, 2.0, 0.0),
+        2.0,
+        Lambertian::new(perlin),
     )));
 
     world
