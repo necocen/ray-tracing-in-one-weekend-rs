@@ -40,12 +40,12 @@ impl Perlin {
     }
 
     pub fn noise_at(&self, p: &Point3) -> f64 {
-        let mut u = p.x().abs().fract();
-        let mut v = p.y().abs().fract();
-        let mut w = p.z().abs().fract();
-        let i = (p.x().abs()) as usize;
-        let j = (p.y().abs()) as usize;
-        let k = (p.z().abs()) as usize;
+        let mut u = p.x() - p.x().floor();
+        let mut v = p.y() - p.y().floor();
+        let mut w = p.z() - p.z().floor();
+        let i = p.x().floor() as isize;
+        let j = p.y().floor() as isize;
+        let k = p.z().floor() as isize;
         let mut c = [[[0.0; 2]; 2]; 2];
         u = u * u * (3.0 - 2.0 * u);
         v = v * v * (3.0 - 2.0 * v);
@@ -53,9 +53,9 @@ impl Perlin {
         (0..2).for_each(|di| {
             (0..2).for_each(|dj| {
                 (0..2).for_each(|dk| {
-                    c[di][dj][dk] = self.rand_float[self.perm_x[(i + di) & 0xff]
-                        ^ self.perm_y[(j + dj) & 0xff]
-                        ^ self.perm_z[(k + dk) & 0xff]]
+                    c[di][dj][dk] = self.rand_float[self.perm_x[(i as usize + di) & 0xff]
+                        ^ self.perm_y[(j as usize + dj) & 0xff]
+                        ^ self.perm_z[(k as usize + dk) & 0xff]]
                 });
             });
         });
