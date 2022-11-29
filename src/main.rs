@@ -3,8 +3,8 @@
 use std::f64::consts::PI;
 
 use camera::Camera;
-use hittables::{BvhTree, Hittable, HittableVec, MovingSphere, Sphere};
-use materials::{Dielectric, Lambertian, Metal};
+use hittables::{BvhTree, Hittable, HittableVec, MovingSphere, Sphere, XyRect};
+use materials::{Dielectric, DiffuseLight, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
 use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
@@ -51,11 +51,12 @@ fn main() {
     // let look_from = Point3::new(13.0, 2.0, 3.0);
     // let look_at = Point3::new(0.0, 0.0, 0.0);
     // let background = Color::new(0.7, 0.8, 1.0);
-    let mut world = earth();
+    let mut world = simple_light();
+    let samples_per_pixel = 400;
     let aperture = 0.0;
     let theta = PI * 20.0 / 180.0;
-    let look_from = Point3::new(13.0, 2.0, 3.0);
-    let look_at = Point3::new(0.0, 0.0, 0.0);
+    let look_from = Point3::new(26.0, 3.0, 6.0);
+    let look_at = Point3::new(0.0, 2.0, 0.0);
     let background = Color::new(0.0, 0.0, 0.0);
 
     let world = BvhTree::new(&mut world, 0.0, 1.0);
@@ -264,6 +265,27 @@ fn earth() -> HittableVec {
     let globe = Sphere::new(Point3::default(), 2.0, earth_surface);
 
     world.push(Box::new(globe));
+
+    world
+}
+
+fn simple_light() -> HittableVec {
+    let mut world = HittableVec::new();
+
+    let perlin = NoiseTexture::new_with_scale(4.0);
+    world.push(Box::new(Sphere::new(
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Lambertian::new(perlin.clone()),
+    )));
+    world.push(Box::new(Sphere::new(
+        Point3::new(0.0, 2.0, 0.0),
+        2.0,
+        Lambertian::new(perlin),
+    )));
+
+    let diff_light = DiffuseLight::new_with_color(Color::new(4.0, 4.0, 4.0));
+    world.push(Box::new(XyRect::new(3.0, 5.0, 1.0, 3.0, -2.0, diff_light)));
 
     world
 }
