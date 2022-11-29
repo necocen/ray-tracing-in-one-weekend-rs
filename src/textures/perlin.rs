@@ -40,13 +40,16 @@ impl Perlin {
     }
 
     pub fn noise_at(&self, p: &Point3) -> f64 {
-        let u = p.x().abs().fract();
-        let v = p.y().abs().fract();
-        let w = p.z().abs().fract();
+        let mut u = p.x().abs().fract();
+        let mut v = p.y().abs().fract();
+        let mut w = p.z().abs().fract();
         let i = (p.x().abs()) as usize;
         let j = (p.y().abs()) as usize;
         let k = (p.z().abs()) as usize;
         let mut c = [[[0.0; 2]; 2]; 2];
+        u = u * u * (3.0 - 2.0 * u);
+        v = v * v * (3.0 - 2.0 * v);
+        w = w * w * (3.0 - 2.0 * w);
         (0..2).for_each(|di| {
             (0..2).for_each(|dj| {
                 (0..2).for_each(|dk| {
