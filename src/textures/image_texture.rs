@@ -20,7 +20,7 @@ impl ImageTexture {
 }
 
 impl Texture for ImageTexture {
-    fn value(&self, mut u: f64, mut v: f64, p: &Point3) -> Color {
+    fn value(&self, mut u: f64, mut v: f64, _p: &Point3) -> Color {
         // Clamp input texture coordinates to [0,1] x [1,0]
         u = u.clamp(0.0, 1.0);
         v = 1.0 - v.clamp(0.0, 1.0);
