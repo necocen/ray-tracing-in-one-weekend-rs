@@ -134,7 +134,7 @@ fn render(
                         let u = (i as f64 + z) / ((image_width - 1) as f64);
                         let v = (j as f64 + w) / ((image_height - 1) as f64);
                         let ray = camera.ray(u, v);
-                        ray_color(ray, background, world, max_depth)
+                        ray_color(&ray, background, world, max_depth)
                     })
                     .sum();
                 c / samples_per_pixel as f64
@@ -145,7 +145,7 @@ fn render(
     image
 }
 
-fn ray_color(ray: Ray, background: Color, world: &impl Hittable, depth: i32) -> Color {
+fn ray_color(ray: &Ray, background: Color, world: &impl Hittable, depth: i32) -> Color {
     if depth <= 0 {
         return Color::default();
     }
@@ -154,11 +154,11 @@ fn ray_color(ray: Ray, background: Color, world: &impl Hittable, depth: i32) -> 
         return background;
     };
     let emitted = hit.material.emitted(hit.u, hit.v, &hit.p);
-    let Some(scatter) = hit.material.scatter(&ray, &hit) else {
+    let Some(scatter) = hit.material.scatter(ray, &hit) else {
         return emitted;
     };
 
-    emitted + scatter.attenuation * ray_color(scatter.ray, background, world, depth - 1)
+    emitted + scatter.attenuation * ray_color(&scatter.ray, background, world, depth - 1)
 }
 
 fn random_scene() -> HittableVec {

@@ -32,7 +32,7 @@ impl<M: Material> XyRect<M> {
 }
 
 impl<M: Material> Hittable for XyRect<M> {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<Hit> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         let t = (self.z - ray.origin.z()) / ray.direction.z();
         if t < t_min || t > t_max {
             return None;
@@ -88,7 +88,7 @@ impl<M: Material> XzRect<M> {
 }
 
 impl<M: Material> Hittable for XzRect<M> {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<Hit> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         let t = (self.y - ray.origin.y()) / ray.direction.y();
         if t < t_min || t > t_max {
             return None;
@@ -144,7 +144,7 @@ impl<M: Material> YzRect<M> {
 }
 
 impl<M: Material> Hittable for YzRect<M> {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<Hit> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         let t = (self.x - ray.origin.x()) / ray.direction.x();
         if t < t_min || t > t_max {
             return None;

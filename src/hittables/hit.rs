@@ -40,7 +40,7 @@ impl<'a> Hit<'a> {
     }
 
     pub fn new_with_outward_normal(
-        ray: Ray,
+        ray: &Ray,
         t: f64,
         u: f64,
         v: f64,

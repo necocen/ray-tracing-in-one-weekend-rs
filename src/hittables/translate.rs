@@ -15,9 +15,9 @@ impl<H: Hittable> Translate<H> {
 }
 
 impl<H: Hittable> Hittable for Translate<H> {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<Hit> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         let moved_ray = Ray::new(ray.origin - self.offset, ray.direction, ray.time);
-        let Some(mut hit) = self.hittable.hit(moved_ray, t_min, t_max) else {
+        let Some(mut hit) = self.hittable.hit(&moved_ray, t_min, t_max) else {
             return None;
         };
         hit.p += self.offset;

@@ -72,7 +72,7 @@ impl<M: Material + Clone + 'static> Box<M> {
 }
 
 impl<M: Material + Clone> Hittable for Box<M> {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<Hit> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         self.sides.hit(ray, t_min, t_max)
     }
 

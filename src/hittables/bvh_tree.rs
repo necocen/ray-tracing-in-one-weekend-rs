@@ -86,8 +86,8 @@ impl<'a> BvhTree<'a> {
 }
 
 impl Hittable for BvhTree<'_> {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<Hit> {
-        if !self.bounding_box(0.0, 0.0).unwrap().hit(&ray, t_min, t_max) {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
+        if !self.bounding_box(0.0, 0.0).unwrap().hit(ray, t_min, t_max) {
             return None;
         }
 

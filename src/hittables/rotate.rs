@@ -54,7 +54,7 @@ impl<H: Hittable> RotateY<H> {
 }
 
 impl<H: Hittable> Hittable for RotateY<H> {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<Hit> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         let mut origin = ray.origin;
         let mut direction = ray.direction;
 
@@ -65,7 +65,7 @@ impl<H: Hittable> Hittable for RotateY<H> {
         direction[2] = self.sin_theta * ray.direction.x() + self.cos_theta * ray.direction.z();
 
         let rotated_ray = Ray::new(origin, direction, ray.time);
-        let Some(mut hit) = self.hittable.hit(rotated_ray, t_min, t_max) else {
+        let Some(mut hit) = self.hittable.hit(&rotated_ray, t_min, t_max) else {
             return None;
         };
 
