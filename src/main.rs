@@ -3,7 +3,7 @@
 use std::f64::consts::PI;
 
 use camera::Camera;
-use hittables::{BvhTree, Hittable, HittableVec, MovingSphere, Sphere, XyRect};
+use hittables::{BvhTree, Hittable, HittableVec, MovingSphere, Sphere, XyRect, XzRect, YzRect};
 use materials::{Dielectric, DiffuseLight, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
@@ -51,12 +51,22 @@ fn main() {
     // let look_from = Point3::new(13.0, 2.0, 3.0);
     // let look_at = Point3::new(0.0, 0.0, 0.0);
     // let background = Color::new(0.7, 0.8, 1.0);
-    let mut world = simple_light();
-    let samples_per_pixel = 400;
+    // let mut world = simple_light();
+    // let samples_per_pixel = 400;
+    // let aperture = 0.0;
+    // let theta = PI * 20.0 / 180.0;
+    // let look_from = Point3::new(26.0, 3.0, 6.0);
+    // let look_at = Point3::new(0.0, 2.0, 0.0);
+    // let background = Color::new(0.0, 0.0, 0.0);
+    let mut world = cornell_box();
+    let aspect_ratio = 1.0;
+    let image_width = 600;
+    let image_height = ((image_width as f64) / aspect_ratio) as usize;
+    let samples_per_pixel = 200;
     let aperture = 0.0;
-    let theta = PI * 20.0 / 180.0;
-    let look_from = Point3::new(26.0, 3.0, 6.0);
-    let look_at = Point3::new(0.0, 2.0, 0.0);
+    let theta = PI * 40.0 / 180.0;
+    let look_from = Point3::new(278.0, 278.0, -800.0);
+    let look_at = Point3::new(278.0, 278.0, 0.0);
     let background = Color::new(0.0, 0.0, 0.0);
 
     let world = BvhTree::new(&mut world, 0.0, 1.0);
@@ -286,6 +296,40 @@ fn simple_light() -> HittableVec {
 
     let diff_light = DiffuseLight::new_with_color(Color::new(4.0, 4.0, 4.0));
     world.push(Box::new(XyRect::new(3.0, 5.0, 1.0, 3.0, -2.0, diff_light)));
+
+    world
+}
+
+fn cornell_box() -> HittableVec {
+    let mut world = HittableVec::new();
+
+    let red = Lambertian::new_with_color(Color::new(0.65, 0.05, 0.05));
+    let white = Lambertian::new_with_color(Color::new(0.73, 0.73, 0.73));
+    let green = Lambertian::new_with_color(Color::new(0.12, 0.45, 0.15));
+    let light = DiffuseLight::new_with_color(Color::new(15.0, 15.0, 15.0));
+
+    world.push(Box::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
+    world.push(Box::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
+    world.push(Box::new(XzRect::new(
+        213.0, 343.0, 227.0, 332.0, 554.0, light,
+    )));
+    world.push(Box::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        white.clone(),
+    )));
+    world.push(Box::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+    world.push(Box::new(XyRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
 
     world
 }
