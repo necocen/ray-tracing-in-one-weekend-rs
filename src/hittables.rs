@@ -1,11 +1,14 @@
 mod aabb;
+mod r#box;
 mod bvh_tree;
 mod hit;
 mod hittable;
 mod hittable_vec;
 mod moving_sphere;
 mod rect;
+mod rotate;
 mod sphere;
+mod translate;
 
 pub use aabb::Aabb;
 pub use bvh_tree::BvhTree;
@@ -13,5 +16,8 @@ pub use hit::Hit;
 pub use hittable::Hittable;
 pub use hittable_vec::HittableVec;
 pub use moving_sphere::MovingSphere;
+pub use r#box::Box;
 pub use rect::{XyRect, XzRect, YzRect};
+pub use rotate::RotateY;
 pub use sphere::Sphere;
+pub use translate::Translate;

@@ -3,7 +3,10 @@
 use std::f64::consts::PI;
 
 use camera::Camera;
-use hittables::{BvhTree, Hittable, HittableVec, MovingSphere, Sphere, XyRect, XzRect, YzRect};
+use hittables::{
+    Box as HittableBox, BvhTree, Hittable, HittableVec, MovingSphere, RotateY, Sphere, Translate,
+    XyRect, XzRect, YzRect,
+};
 use materials::{Dielectric, DiffuseLight, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
@@ -329,7 +332,37 @@ fn cornell_box() -> HittableVec {
         555.0,
         white.clone(),
     )));
-    world.push(Box::new(XyRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
+    world.push(Box::new(XyRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+
+    world.push(Box::new(Translate::new(
+        RotateY::new(
+            HittableBox::new(
+                Point3::new(0.0, 0.0, 0.0),
+                Point3::new(165.0, 330.0, 165.0),
+                white.clone(),
+            ),
+            PI * 15.0 / 180.0,
+        ),
+        Vec3::new(265.0, 0.0, 295.0),
+    )));
+    world.push(Box::new(Translate::new(
+        RotateY::new(
+            HittableBox::new(
+                Point3::new(0.0, 0.0, 0.0),
+                Point3::new(165.0, 165.0, 165.0),
+                white,
+            ),
+            PI * -18.0 / 180.0,
+        ),
+        Vec3::new(130.0, 0.0, 65.0),
+    )));
 
     world
 }
