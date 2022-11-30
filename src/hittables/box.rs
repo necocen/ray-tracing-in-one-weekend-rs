@@ -1,6 +1,6 @@
 use crate::{materials::Material, ray::Ray, vec3::Point3};
 
-use super::{Aabb, Hit, Hittable, HittableVec, XyRect, XzRect};
+use super::{Aabb, Hit, Hittable, HittableVec, XyRect, XzRect, YzRect};
 
 pub struct Box<M: Material + Clone> {
     box_min: Point3,
@@ -44,20 +44,20 @@ impl<M: Material + Clone + 'static> Box<M> {
                 box_min.y(),
                 material.clone(),
             )),
-            std::boxed::Box::new(XzRect::new(
-                box_min.x(),
-                box_max.x(),
+            std::boxed::Box::new(YzRect::new(
+                box_min.y(),
+                box_max.y(),
                 box_min.z(),
                 box_max.z(),
-                box_max.y(),
+                box_max.x(),
                 material.clone(),
             )),
-            std::boxed::Box::new(XzRect::new(
-                box_min.x(),
-                box_max.x(),
+            std::boxed::Box::new(YzRect::new(
+                box_min.y(),
+                box_max.y(),
                 box_min.z(),
                 box_max.z(),
-                box_min.y(),
+                box_min.x(),
                 material.clone(),
             )),
         ];
