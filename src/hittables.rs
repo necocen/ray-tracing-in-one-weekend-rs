@@ -1,6 +1,7 @@
 mod aabb;
 mod r#box;
 mod bvh_tree;
+mod constant_medium;
 mod hit;
 mod hittable;
 mod hittable_vec;
@@ -12,6 +13,7 @@ mod translate;
 
 pub use aabb::Aabb;
 pub use bvh_tree::BvhTree;
+pub use constant_medium::ConstantMedium;
 pub use hit::Hit;
 pub use hittable::Hittable;
 pub use hittable_vec::HittableVec;

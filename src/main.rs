@@ -4,8 +4,8 @@ use std::f64::consts::PI;
 
 use camera::Camera;
 use hittables::{
-    Box as HittableBox, BvhTree, Hittable, HittableVec, MovingSphere, RotateY, Sphere, Translate,
-    XyRect, XzRect, YzRect,
+    Box as HittableBox, BvhTree, ConstantMedium, Hittable, HittableVec, MovingSphere, RotateY,
+    Sphere, Translate, XyRect, XzRect, YzRect,
 };
 use materials::{Dielectric, DiffuseLight, Lambertian, Metal};
 use rand::Rng;
@@ -61,7 +61,17 @@ fn main() {
     // let look_from = Point3::new(26.0, 3.0, 6.0);
     // let look_at = Point3::new(0.0, 2.0, 0.0);
     // let background = Color::new(0.0, 0.0, 0.0);
-    let mut world = cornell_box();
+    // let mut world = cornell_box();
+    // let aspect_ratio = 1.0;
+    // let image_width = 600;
+    // let image_height = ((image_width as f64) / aspect_ratio) as usize;
+    // let samples_per_pixel = 200;
+    // let aperture = 0.0;
+    // let theta = PI * 40.0 / 180.0;
+    // let look_from = Point3::new(278.0, 278.0, -800.0);
+    // let look_at = Point3::new(278.0, 278.0, 0.0);
+    // let background = Color::new(0.0, 0.0, 0.0);
+    let mut world = cornell_smoke();
     let aspect_ratio = 1.0;
     let image_width = 600;
     let image_height = ((image_width as f64) / aspect_ratio) as usize;
@@ -362,6 +372,78 @@ fn cornell_box() -> HittableVec {
             PI * -18.0 / 180.0,
         ),
         Vec3::new(130.0, 0.0, 65.0),
+    )));
+
+    world
+}
+
+fn cornell_smoke() -> HittableVec {
+    let mut world = HittableVec::new();
+
+    let red = Lambertian::new_with_color(Color::new(0.65, 0.05, 0.05));
+    let white = Lambertian::new_with_color(Color::new(0.73, 0.73, 0.73));
+    let green = Lambertian::new_with_color(Color::new(0.12, 0.45, 0.15));
+    let light = DiffuseLight::new_with_color(Color::new(7.0, 7.0, 7.0));
+
+    world.push(Box::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
+    world.push(Box::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
+    world.push(Box::new(XzRect::new(
+        113.0, 443.0, 127.0, 432.0, 554.0, light,
+    )));
+    world.push(Box::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        white.clone(),
+    )));
+    world.push(Box::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+    world.push(Box::new(XyRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+
+    world.push(Box::new(ConstantMedium::new_with_color(
+        Translate::new(
+            RotateY::new(
+                HittableBox::new(
+                    Point3::new(0.0, 0.0, 0.0),
+                    Point3::new(165.0, 330.0, 165.0),
+                    white.clone(),
+                ),
+                PI * 15.0 / 180.0,
+            ),
+            Vec3::new(265.0, 0.0, 295.0),
+        ),
+        Color::new(0.0, 0.0, 0.0),
+        0.01,
+    )));
+    world.push(Box::new(ConstantMedium::new_with_color(
+        Translate::new(
+            RotateY::new(
+                HittableBox::new(
+                    Point3::new(0.0, 0.0, 0.0),
+                    Point3::new(165.0, 165.0, 165.0),
+                    white,
+                ),
+                PI * -18.0 / 180.0,
+            ),
+            Vec3::new(130.0, 0.0, 65.0),
+        ),
+        Color::new(1.0, 1.0, 1.0),
+        0.01,
     )));
 
     world
