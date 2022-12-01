@@ -71,14 +71,24 @@ fn main() {
     // let look_from = Point3::new(278.0, 278.0, -800.0);
     // let look_at = Point3::new(278.0, 278.0, 0.0);
     // let background = Color::new(0.0, 0.0, 0.0);
-    let world = cornell_smoke();
+    // let world = cornell_smoke();
+    // let aspect_ratio = 1.0;
+    // let image_width = 600;
+    // let image_height = ((image_width as f64) / aspect_ratio) as usize;
+    // let samples_per_pixel = 200;
+    // let aperture = 0.0;
+    // let theta = PI * 40.0 / 180.0;
+    // let look_from = Point3::new(278.0, 278.0, -800.0);
+    // let look_at = Point3::new(278.0, 278.0, 0.0);
+    // let background = Color::new(0.0, 0.0, 0.0);
+    let world = final_scene();
     let aspect_ratio = 1.0;
-    let image_width = 600;
+    let image_width = 800;
     let image_height = ((image_width as f64) / aspect_ratio) as usize;
-    let samples_per_pixel = 200;
+    let samples_per_pixel = 10000;
     let aperture = 0.0;
     let theta = PI * 40.0 / 180.0;
-    let look_from = Point3::new(278.0, 278.0, -800.0);
+    let look_from = Point3::new(478.0, 278.0, -600.0);
     let look_at = Point3::new(278.0, 278.0, 0.0);
     let background = Color::new(0.0, 0.0, 0.0);
 
@@ -444,6 +454,108 @@ fn cornell_smoke() -> HittableVec {
         ),
         Color::new(1.0, 1.0, 1.0),
         0.01,
+    )));
+
+    world
+}
+
+fn final_scene() -> HittableVec {
+    let mut world = HittableVec::new();
+
+    let light = DiffuseLight::new_with_color(Color::new(7.0, 7.0, 7.0));
+    world.push(Box::new(XzRect::new(
+        123.0, 423.0, 147.0, 412.0, 554.0, light,
+    )));
+
+    let boxes1 = (0..20)
+        .flat_map(|i| {
+            (0..20).map(move |j| {
+                let ground = Lambertian::new_with_color(Color::new(0.48, 0.83, 0.53));
+                let mut rng = rand::thread_rng();
+                let w = 100.0;
+                let x0 = -1000.0 + *&i as f64 * w;
+                let z0 = -1000.0 + j as f64 * w;
+                let y0 = 0.0;
+                let x1 = x0 + w;
+                let y1 = rng.gen_range(1.0..101.0);
+                let z1 = z0 + w;
+                Box::new(HittableBox::new(
+                    Point3::new(x0, y0, z0),
+                    Point3::new(x1, y1, z1),
+                    ground,
+                )) as Box<dyn Hittable>
+            })
+        })
+        .collect::<Vec<_>>();
+    world.push(Box::new(BvhTree::new(boxes1, 0.0, 1.0)));
+
+    let moving_sphere_material = Lambertian::new_with_color(Color::new(0.7, 0.3, 0.1));
+    world.push(Box::new(MovingSphere::new(
+        Point3::new(400.0, 400.0, 200.0),
+        Point3::new(430.0, 400.0, 200.0),
+        0.0,
+        1.0,
+        50.0,
+        moving_sphere_material,
+    )));
+
+    let dielectric_material = Dielectric::new(1.5);
+    world.push(Box::new(Sphere::new(
+        Point3::new(260.0, 150.0, 45.0),
+        50.0,
+        dielectric_material,
+    )));
+
+    let metal_material = Metal::new(Color::new(0.8, 0.8, 0.9), 1.0);
+    world.push(Box::new(Sphere::new(
+        Point3::new(0.0, 150.0, 145.0),
+        50.0,
+        metal_material,
+    )));
+
+    let boundary = Sphere::new(Point3::new(360.0, 150.0, 145.0), 70.0, Dielectric::new(1.5));
+    world.push(Box::new(boundary.clone()));
+    world.push(Box::new(ConstantMedium::new_with_color(
+        boundary,
+        Color::new(0.2, 0.4, 0.9),
+        0.2,
+    )));
+
+    let boundary = Sphere::new(Point3::new(0.0, 0.0, 5.0), 5000.0, Dielectric::new(1.5));
+    world.push(Box::new(ConstantMedium::new_with_color(
+        boundary,
+        Color::new(1.0, 1.0, 1.0),
+        0.0001,
+    )));
+
+    let earth_material =
+        Lambertian::new(ImageTexture::new_with_filename("./earthmap.jpg").unwrap());
+    world.push(Box::new(Sphere::new(
+        Point3::new(400.0, 200.0, 400.0),
+        100.0,
+        earth_material,
+    )));
+
+    let perlin_material = Lambertian::new(NoiseTexture::new_with_scale(0.1));
+    world.push(Box::new(Sphere::new(
+        Point3::new(220.0, 280.0, 300.0),
+        80.0,
+        perlin_material,
+    )));
+
+    let white = Lambertian::new_with_color(Color::new(0.73, 0.73, 0.73));
+    let boxes2 = (0..1000)
+        .map(|_| {
+            Box::new(Sphere::new(
+                Point3::random_range(0.0..165.0),
+                10.0,
+                white.clone(),
+            )) as Box<dyn Hittable>
+        })
+        .collect::<Vec<_>>();
+    world.push(Box::new(Translate::new(
+        RotateY::new(BvhTree::new(boxes2, 0.0, 1.0), PI * 15.0 / 180.0),
+        Vec3::new(-100.0, 270.0, 395.0),
     )));
 
     world

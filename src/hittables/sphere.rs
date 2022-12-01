@@ -8,7 +8,7 @@ use crate::{
 
 use super::{Aabb, Hit, Hittable};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[non_exhaustive]
 pub struct Sphere<M: Material> {
     pub center: Point3,

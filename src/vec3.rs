@@ -1,4 +1,8 @@
-use std::{fmt::Display, io, iter, ops};
+use std::{
+    fmt::Display,
+    io, iter,
+    ops::{self, Range},
+};
 
 use rand::Rng;
 
@@ -52,6 +56,14 @@ impl Vec3 {
             rng.gen_range(-1.0..1.0),
             rng.gen_range(-1.0..1.0),
             rng.gen_range(-1.0..1.0),
+        )
+    }
+    pub fn random_range(range: Range<f64>) -> Vec3 {
+        let mut rng = rand::thread_rng();
+        Vec3::new(
+            rng.gen_range(range.clone()),
+            rng.gen_range(range.clone()),
+            rng.gen_range(range),
         )
     }
 
