@@ -71,7 +71,7 @@ fn main() {
     // let look_from = Point3::new(278.0, 278.0, -800.0);
     // let look_at = Point3::new(278.0, 278.0, 0.0);
     // let background = Color::new(0.0, 0.0, 0.0);
-    let mut world = cornell_smoke();
+    let world = cornell_smoke();
     let aspect_ratio = 1.0;
     let image_width = 600;
     let image_height = ((image_width as f64) / aspect_ratio) as usize;
@@ -82,7 +82,7 @@ fn main() {
     let look_at = Point3::new(278.0, 278.0, 0.0);
     let background = Color::new(0.0, 0.0, 0.0);
 
-    let world = BvhTree::new(&mut world, 0.0, 1.0);
+    let world = BvhTree::new(world, 0.0, 1.0);
 
     // Camera
     let v_up = Vec3::new(0.0, 1.0, 0.0);

@@ -4,23 +4,23 @@ use rand::Rng;
 
 use crate::ray::Ray;
 
-use super::{Aabb, Hit, Hittable};
+use super::{Aabb, Hit, Hittable, HittableVec};
 
 #[non_exhaustive]
-pub enum BvhTree<'a> {
+pub enum BvhTree {
     Leaf {
         bounding_box: Aabb,
-        hittable: &'a dyn Hittable,
+        hittable: Box<dyn Hittable>,
     },
     Node {
         bounding_box: Aabb,
-        left: Box<BvhTree<'a>>,
-        right: Box<BvhTree<'a>>,
+        left: Box<BvhTree>,
+        right: Box<BvhTree>,
     },
 }
 
-impl<'a> BvhTree<'a> {
-    fn new_leaf(hittable: &'a dyn Hittable, time0: f64, time1: f64) -> BvhTree<'a> {
+impl BvhTree {
+    fn new_leaf(hittable: Box<dyn Hittable>, time0: f64, time1: f64) -> BvhTree {
         let Some(bounding_box) = hittable.bounding_box(time0, time1) else {
             panic!("No bounding box")
         };
@@ -30,9 +30,9 @@ impl<'a> BvhTree<'a> {
         }
     }
 
-    pub fn new(hittables: &'a mut [Box<dyn Hittable>], time0: f64, time1: f64) -> BvhTree<'a> {
-        let left: BvhTree<'a>;
-        let right: BvhTree<'a>;
+    pub fn new(mut hittables: HittableVec, time0: f64, time1: f64) -> BvhTree {
+        let left: BvhTree;
+        let right: BvhTree;
         let mut rng = rand::thread_rng();
         let axis: usize = rng.gen_range(0..3);
         #[allow(clippy::borrowed_box)]
@@ -41,22 +41,24 @@ impl<'a> BvhTree<'a> {
         };
         match hittables.len() {
             1 => {
-                return BvhTree::new_leaf(hittables[0].as_ref(), time0, time1);
+                return BvhTree::new_leaf(hittables.pop().unwrap(), time0, time1);
             }
             2 => {
-                if compare(&hittables[0], &hittables[1]).is_gt() {
-                    left = BvhTree::new_leaf(hittables[0].as_ref(), time0, time1);
-                    right = BvhTree::new_leaf(hittables[1].as_ref(), time0, time1);
+                let r = hittables.pop().unwrap();
+                let l = hittables.pop().unwrap();
+                if compare(&l, &r).is_gt() {
+                    left = BvhTree::new_leaf(l, time0, time1);
+                    right = BvhTree::new_leaf(r, time0, time1);
                 } else {
-                    left = BvhTree::new_leaf(hittables[1].as_ref(), time0, time1);
-                    right = BvhTree::new_leaf(hittables[0].as_ref(), time0, time1);
+                    left = BvhTree::new_leaf(r, time0, time1);
+                    right = BvhTree::new_leaf(l, time0, time1);
                 }
             }
             _ => {
                 hittables.sort_by(compare);
-                let (l, r) = hittables.split_at_mut(hittables.len() / 2);
-                left = BvhTree::new(l, time0, time1);
-                right = BvhTree::new(r, time0, time1);
+                let hittables_right = hittables.split_off(hittables.len() / 2);
+                left = BvhTree::new(hittables, time0, time1);
+                right = BvhTree::new(hittables_right, time0, time1);
             }
         }
 
@@ -85,7 +87,7 @@ impl<'a> BvhTree<'a> {
     }
 }
 
-impl Hittable for BvhTree<'_> {
+impl Hittable for BvhTree {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         if !self.bounding_box(0.0, 0.0).unwrap().hit(ray, t_min, t_max) {
             return None;
