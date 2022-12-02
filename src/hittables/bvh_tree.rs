@@ -35,10 +35,6 @@ impl BvhTree {
         let right: BvhTree;
         let mut rng = rand::thread_rng();
         let axis: usize = rng.gen_range(0..3);
-        #[allow(clippy::borrowed_box)]
-        let compare = |a: &Box<dyn Hittable>, b: &Box<dyn Hittable>| {
-            Self::compare_box(a.as_ref(), b.as_ref(), axis)
-        };
         match hittables.len() {
             1 => {
                 return BvhTree::new_leaf(hittables.pop().unwrap(), time0, time1);
@@ -46,7 +42,7 @@ impl BvhTree {
             2 => {
                 let r = hittables.pop().unwrap();
                 let l = hittables.pop().unwrap();
-                if compare(&l, &r).is_gt() {
+                if Self::compare_box(l.as_ref(), r.as_ref(), axis).is_gt() {
                     left = BvhTree::new_leaf(l, time0, time1);
                     right = BvhTree::new_leaf(r, time0, time1);
                 } else {
@@ -55,7 +51,7 @@ impl BvhTree {
                 }
             }
             _ => {
-                hittables.sort_by(compare);
+                hittables.sort_by(|a, b| Self::compare_box(a.as_ref(), b.as_ref(), axis));
                 let hittables_right = hittables.split_off(hittables.len() / 2);
                 left = BvhTree::new(hittables, time0, time1);
                 right = BvhTree::new(hittables_right, time0, time1);
