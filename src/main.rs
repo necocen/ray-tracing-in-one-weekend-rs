@@ -10,6 +10,7 @@ use hittables::{
 use materials::{Dielectric, DiffuseLight, Lambertian, Metal};
 use rand::Rng;
 use ray::Ray;
+#[cfg(feature = "parallel")]
 use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
 use textures::{CheckerTexture, ImageTexture, NoiseTexture};
 use vec3::{Color, Point3, Vec3};
@@ -140,27 +141,77 @@ fn render(
     max_depth: i32,
 ) -> Vec<Vec<Color>> {
     let mut image = Vec::<Vec<Color>>::with_capacity(image_height);
+    #[allow(clippy::too_many_arguments)]
+    fn sample(
+        image_width: usize,
+        image_height: usize,
+        camera: &Camera,
+        background: Color,
+        world: &impl Hittable,
+        max_depth: i32,
+        i: usize,
+        j: usize,
+    ) -> Color {
+        let mut rng = rand::thread_rng();
+        let z: f64 = rng.gen();
+        let w: f64 = rng.gen();
+        let u = (i as f64 + z) / ((image_width - 1) as f64);
+        let v = (j as f64 + w) / ((image_height - 1) as f64);
+        let ray = camera.ray(u, v);
+        ray_color(&ray, background, world, max_depth)
+    }
+
     for j in (0..image_height).rev() {
         eprint!("\rScanlines remaining: {j:>3}");
-        let mut row = Vec::<Color>::with_capacity(image_width);
-        (0..image_width)
-            .into_par_iter()
-            .map(|i| {
-                let c: Color = (0..samples_per_pixel)
+        cfg_if::cfg_if! {
+            if #[cfg(feature = "parallel")] {
+                let mut row = Vec::<Color>::with_capacity(image_width);
+                (0..image_width)
                     .into_par_iter()
-                    .map(|_| {
-                        let mut rng = rand::thread_rng();
-                        let z: f64 = rng.gen();
-                        let w: f64 = rng.gen();
-                        let u = (i as f64 + z) / ((image_width - 1) as f64);
-                        let v = (j as f64 + w) / ((image_height - 1) as f64);
-                        let ray = camera.ray(u, v);
-                        ray_color(&ray, background, world, max_depth)
+                    .map(|i| {
+                        let c: Color = (0..samples_per_pixel)
+                            .into_par_iter()
+                            .map(|_| {
+                                sample(
+                                    image_width,
+                                    image_height,
+                                    camera,
+                                    background,
+                                    world,
+                                    max_depth,
+                                    i,
+                                    j,
+                                )
+                            })
+                            .sum();
+                        c / samples_per_pixel as f64
                     })
-                    .sum();
-                c / samples_per_pixel as f64
-            })
-            .collect_into_vec(&mut row);
+                    .collect_into_vec(&mut row);
+            } else {
+                let row = (0..image_width)
+                    .into_iter()
+                    .map(|i| {
+                        let c: Color = (0..samples_per_pixel)
+                            .into_iter()
+                            .map(|_| {
+                                sample(
+                                    image_width,
+                                    image_height,
+                                    camera,
+                                    background,
+                                    world,
+                                    max_depth,
+                                    i,
+                                    j,
+                                )
+                            })
+                            .sum();
+                        c / samples_per_pixel as f64
+                    })
+                    .collect::<Vec<_>>();
+            }
+        }
+
         image.push(row);
     }
     image
