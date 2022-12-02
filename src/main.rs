@@ -525,7 +525,7 @@ fn final_scene() -> HittableVec {
                 let ground = Lambertian::new_with_color(Color::new(0.48, 0.83, 0.53));
                 let mut rng = rand::thread_rng();
                 let w = 100.0;
-                let x0 = -1000.0 + *&i as f64 * w;
+                let x0 = -1000.0 + i as f64 * w;
                 let z0 = -1000.0 + j as f64 * w;
                 let y0 = 0.0;
                 let x1 = x0 + w;
