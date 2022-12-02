@@ -6,10 +6,8 @@ pub fn atan2(y: f64, x: f64) -> f64 {
     if x == 0.0 {
         if y == 0.0 {
             return 0.0;
-        } else if y > 0.0 {
-            return FRAC_PI_2;
         } else {
-            return -FRAC_PI_2;
+            return FRAC_PI_2 * y.signum();
         }
     } else if y == 0.0 {
         if x > 0.0 {
