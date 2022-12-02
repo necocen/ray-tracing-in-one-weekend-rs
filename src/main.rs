@@ -17,6 +17,7 @@ use vec3::{Color, Point3, Vec3};
 mod camera;
 mod hittables;
 mod materials;
+mod math;
 mod ray;
 mod textures;
 mod vec3;

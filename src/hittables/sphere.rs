@@ -6,6 +6,9 @@ use crate::{
     vec3::{Point3, Vec3},
 };
 
+#[cfg(feature = "approx-trigonometry")]
+use crate::math::{acos, atan2};
+
 use super::{Aabb, Hit, Hittable};
 
 #[derive(Debug, Clone)]
@@ -33,7 +36,13 @@ impl<M: Material> Sphere<M> {
     /// <0 1 0> yields <0.50 1.00>       < 0 -1  0> yields <0.50 0.00>
     /// <0 0 1> yields <0.25 0.50>       < 0  0 -1> yields <0.75 0.50>
     fn get_sphere_uv(p: &Point3) -> (f64, f64) {
+        #[cfg(feature = "approx-trigonometry")]
+        let theta = acos(-p.y());
+        #[cfg(feature = "approx-trigonometry")]
+        let phi = atan2(-p.z(), p.x()) + PI;
+        #[cfg(not(feature = "approx-trigonometry"))]
         let theta = (-p.y()).acos();
+        #[cfg(not(feature = "approx-trigonometry"))]
         let phi = (-p.z()).atan2(p.x()) + PI;
 
         (phi / (2.0 * PI), theta / PI)
