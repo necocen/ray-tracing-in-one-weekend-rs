@@ -16,4 +16,5 @@ anyhow = "1.0.66"
 cfg-if = "1.0.0"
 image = "0.24.5"
 rand = "0.8.5"
+rand_distr = "0.4.3"
 rayon = { version = "1.5.3", optional = true }
